@@ -255,8 +255,7 @@ export const liveItem = {
           getAttribute(n, "status") &&
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           lookup(Phase4LiveStatus, getAttribute(n, "status")!.toLowerCase()) &&
-          getAttribute(n, "start") &&
-          getAttribute(n, "end")
+          getAttribute(n, "start")
       )
     ),
   supportCheck: (node: XmlNode[]): boolean => node.length > 0,
