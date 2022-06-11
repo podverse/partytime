@@ -173,7 +173,7 @@ export const podcastImages = {
   supportCheck: (node: XmlNode): boolean => Boolean(node),
   fn(node: XmlNode): { podcastImages: Phase4PodcastImage[] } {
     return {
-      podcastImages: (getKnownAttribute(node, "srcset")
+      podcastImages: getKnownAttribute(node, "srcset")
         .split(",")
         .reduce<Phase4PodcastImage[]>((acc, n) => {
           const raw = n.trim();
@@ -203,7 +203,7 @@ export const podcastImages = {
             return [...acc, val as Phase4PodcastImage];
           }
           return acc;
-        }, [] as Phase4PodcastImage[]) as unknown) as Phase4PodcastImage[],
+        }, [] as Phase4PodcastImage[]) as unknown as Phase4PodcastImage[],
     };
   },
 };

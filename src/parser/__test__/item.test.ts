@@ -1141,8 +1141,7 @@ describe("item handling", () => {
 
       expect(first.enclosure).toEqual(
         expect.objectContaining({
-          url:
-            "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9649255632.mp3?updated=1631664875",
+          url: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9649255632.mp3?updated=1631664875",
           length: 0,
           type: "audio/mpeg",
         })
