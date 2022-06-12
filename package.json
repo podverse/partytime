@@ -1,5 +1,5 @@
 {
-  "name": "podcast-partytime",
+  "name": "@podverse/podcast-partytime",
   "version": "4.3.2-pv.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
