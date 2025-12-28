@@ -112,6 +112,28 @@ export enum Phase4Medium {
   Blog = "blog",
   /** a feed of podcasts from the same publisher */
   Publisher = "publisher",
+  /** a feed of training material (audio or video courses) with each item being a session or chapter of the course or conference track */
+  Course = "course",
+  /** List variant: a list of podcast feeds */
+  PodcastL = "podcastl",
+  /** List variant: a list of music feeds */
+  MusicL = "musicl",
+  /** List variant: a list of video feeds */
+  VideoL = "videol",
+  /** List variant: a list of film feeds */
+  FilmL = "filml",
+  /** List variant: a list of audiobook feeds */
+  AudiobookL = "audiobookl",
+  /** List variant: a list of newsletter feeds */
+  NewsletterL = "newsletterl",
+  /** List variant: a list of blog feeds */
+  BlogL = "blogl",
+  /** List variant: a list of publisher feeds */
+  PublisherL = "publisherl",
+  /** List variant: a list of course feeds */
+  CourseL = "coursel",
+  /** Mixed list: a list of remote items of mixed types */
+  Mixed = "mixed",
 }
 export const medium: FeedUpdate = {
   tag: "podcast:medium",
