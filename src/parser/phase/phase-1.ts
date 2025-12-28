@@ -83,7 +83,9 @@ function deriveMimeType(typeAttribute: string | null): TranscriptType {
     case "text/vtt":
       return TranscriptType.VTT;
     default:
+      // eslint-disable-next-line no-console
       console.warn("Unexpected transcript type", typeAttribute);
+      // eslint-disable-next-line no-console
       console.warn(" Please open an issue - https://github.com/RyanHirsch/partytime/issues");
       return TranscriptType.UNKNOWN;
   }

@@ -292,7 +292,8 @@ describe("phase 6", () => {
     const supportedName = "remoteItem";
 
     it("extracts remote item with optional fields", () => {
-      const result = helpers.parseValidFeed(`<rss xmlns:podcast="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md" version="2.0">
+      const result =
+        helpers.parseValidFeed(`<rss xmlns:podcast="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md" version="2.0">
       <channel>
           <title>My favorite v4v music</title>
           <description>This is a playlist of some of my favorite v4v music</description>
@@ -326,7 +327,8 @@ describe("phase 6", () => {
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
     it("extracts remote items from a playlist feed", () => {
-      const result = helpers.parseValidFeed(`<rss xmlns:podcast="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md" version="2.0">
+      const result =
+        helpers.parseValidFeed(`<rss xmlns:podcast="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md" version="2.0">
       <channel>
           <title>My favorite v4v music</title>
           <description>This is a playlist of some of my favorite v4v music</description>
