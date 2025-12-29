@@ -96,6 +96,12 @@ export async function checkAll(): Promise<void> {
   }
 }
 
+// Uncomment to run all feed checks
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+// (async () => {
+//   await checkAll();
+// })();
+
 function save<T>({
   relativePath,
   data,
@@ -106,6 +112,7 @@ function save<T>({
   parser: (d: T) => string;
 }): Promise<void> {
   const filePath = path.resolve(__dirname, relativePath);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
   logger.info(`Save ${filePath}`);
   return new Promise((resolve, reject) =>
     fs.writeFile(filePath, parser(data), (err) => {
@@ -152,6 +159,8 @@ async function getFeed(uri: string): Promise<void> {
     "..",
     `results/${feedObject.title.toLowerCase().replace(/'/g, "").replace(/\W+/g, "-")}.json`
   );
+  fs.mkdirSync(path.dirname(parsed), { recursive: true });
+
   logger.info(`Parsed feed object ${parsed}`);
   fs.writeFileSync(parsed, stringify({ ...feedObject, url: uri }));
   await Promise.all([xmlSave, listSave]);

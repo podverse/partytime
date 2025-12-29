@@ -18,13 +18,12 @@ export function register(parent: string, updater: FeedUpdate | ItemUpdate): void
   if (foundParent) {
     foundParent.children.push(updater.tag);
   } else {
+    // eslint-disable-next-line no-console
     console.warn(`Missing parent ${parent}, child tag may not parse as expected`);
   }
 }
 
-export function getChildParsers(
-  tag: string
-): Array<{
+export function getChildParsers(tag: string): Array<{
   updater: FeedUpdate | ItemUpdate;
   children: string[];
 }> {
