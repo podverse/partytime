@@ -1,0 +1,6 @@
+{
+  "ext": "ts",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

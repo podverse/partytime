@@ -112,6 +112,28 @@ export enum Phase4Medium {
   Blog = "blog",
   /** a feed of podcasts from the same publisher */
   Publisher = "publisher",
+  /** a feed of training material (audio or video courses) with each item being a session or chapter of the course or conference track */
+  Course = "course",
+  /** List variant: a list of podcast feeds */
+  PodcastL = "podcastl",
+  /** List variant: a list of music feeds */
+  MusicL = "musicl",
+  /** List variant: a list of video feeds */
+  VideoL = "videol",
+  /** List variant: a list of film feeds */
+  FilmL = "filml",
+  /** List variant: a list of audiobook feeds */
+  AudiobookL = "audiobookl",
+  /** List variant: a list of newsletter feeds */
+  NewsletterL = "newsletterl",
+  /** List variant: a list of blog feeds */
+  BlogL = "blogl",
+  /** List variant: a list of publisher feeds */
+  PublisherL = "publisherl",
+  /** List variant: a list of course feeds */
+  CourseL = "coursel",
+  /** Mixed list: a list of remote items of mixed types */
+  Mixed = "mixed",
 }
 export const medium: FeedUpdate = {
   tag: "podcast:medium",
@@ -167,7 +189,7 @@ export const podcastImages = {
   supportCheck: (node: XmlNode): boolean => Boolean(node),
   fn(node: XmlNode): { podcastImages: Phase4PodcastImage[] } {
     return {
-      podcastImages: (getKnownAttribute(node, "srcset")
+      podcastImages: getKnownAttribute(node, "srcset")
         .split(",")
         .reduce<Phase4PodcastImage[]>((acc, n) => {
           const raw = n.trim();
@@ -197,7 +219,7 @@ export const podcastImages = {
             return [...acc, val as Phase4PodcastImage];
           }
           return acc;
-        }, [] as Phase4PodcastImage[]) as unknown) as Phase4PodcastImage[],
+        }, [] as Phase4PodcastImage[]) as unknown as Phase4PodcastImage[],
     };
   },
 };

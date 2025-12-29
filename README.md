@@ -1,6 +1,6 @@
 # Partytime Podcast Parser
 
-[![NPM version](https://img.shields.io/npm/v/podcast-partytime.svg)](https://www.npmjs.com/package/podcast-partytime)
+[![NPM version](https://img.shields.io/npm/v/podverse-partytime.svg)](https://www.npmjs.com/package/podverse-partytime)
 
 Podcast feed parser, originally extracted from podcast index - https://github.com/Podcastindex-org/aggregator/tree/master/partytime. It is up to you, the consumer of this package, to fetch the feed which needs to be parsed. When fetching the feed YOU SHOULD INCLUDE A PROPER USER-AGENT.
 
@@ -11,14 +11,14 @@ By default, this will produce log messages that are warnings or errors, but this
 ## Usage
 
 ```sh
-npm install podcast-partytime
+npm install podverse-partytime
 ```
 
 ### Typescript
 
 ```ts
 import fetch from "node-fetch";
-import pt from "podcast-partytime";
+import pt from "podverse-partytime";
 
 // Check CORS support
 pt.checkFeedByUri("https://www.spreaker.com/show/3128218/episodes/feed").then(console.log);
@@ -52,7 +52,7 @@ fetch("http://mp3s.nashownotes.com/pc20rss.xml", {
 
 ```js
 const fetch = require("node-fetch");
-const pt = require("podcast-partytime");
+const pt = require("podverse-partytime");
 
 // Check CORS support
 pt.checkFeedByUri("https://www.spreaker.com/show/3128218/episodes/feed").then(console.log);

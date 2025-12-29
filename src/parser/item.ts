@@ -73,7 +73,12 @@ export function getGuid(item: XmlNode): string {
     return numberValue.toString();
   }
 
-  console.warn("Empty/missing guid, returning empty string");
+  if (typeof process !== "undefined" && !process.env?.JEST_WORKER_ID) {
+    // This block is safe for both Node and browser
+    // eslint-disable-next-line no-console
+    console.warn("Empty/missing guid, returning empty string");
+  }
+
   return "";
 }
 

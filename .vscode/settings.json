@@ -85,5 +85,10 @@
       "name": "podcast index",
       "database": "${workspaceFolder:partytime}/src/parser/__test__/fixtures/podcastindex_feeds.db"
     }
-  ]
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": ["javascript", "typescript"],
+  "eslint.alwaysShowStatus": true,
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": true
 }
