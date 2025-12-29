@@ -1,11 +1,11 @@
-import parser, { ValidationError } from "fast-xml-parser";
+import { XMLParser, XMLValidator } from "fast-xml-parser";
 import he from "he";
 
 import { XmlNode } from "./types";
 
 const parserOptions = {
   attributeNamePrefix: "@_",
-  attrNodeName: "attr", // default is 'false'
+  attributesGroupName: "attr",
   textNodeName: "#text",
   ignoreAttributes: false,
   ignoreNameSpace: false,
@@ -13,19 +13,25 @@ const parserOptions = {
   parseNodeValue: true,
   parseAttributeValue: false,
   trimValues: true,
-  // cdataTagName: "__cdata", //default is 'false'
-  // cdataPositionChar: "\\c",
   parseTrueNumberOnly: false,
-  arrayMode: false, // "strict"
-  tagValueProcessor: (val: string) => he.decode(val), // default is a=>a
+  alwaysCreateTextNode: true,
+  tagValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
+  attributeValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
   stopNodes: ["parse-me-as-string"],
 };
 
-export function validate(xml: string): true | ValidationError {
-  return parser.validate(xml.trim());
+export function validate(xml: string): true | unknown {
+  const validator = XMLValidator as unknown as { validate: (s: string) => true | unknown };
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return validator.validate(xml.trim());
 }
 
 export function parse(xml: string): XmlNode {
+  const ParserCtor = XMLParser as unknown as new (opts?: Record<string, unknown>) => {
+    parse: (s: string) => XmlNode;
+  };
+
+  const xmlParser = new ParserCtor(parserOptions as Record<string, unknown>);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return parser.parse(xml.trim(), parserOptions);
+  return xmlParser.parse(xml.trim());
 }
