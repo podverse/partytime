@@ -14,7 +14,6 @@ const parserOptions = {
   parseAttributeValue: false,
   trimValues: true,
   parseTrueNumberOnly: false,
-  alwaysCreateTextNode: true,
   tagValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
   attributeValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
   stopNodes: ["parse-me-as-string"],
