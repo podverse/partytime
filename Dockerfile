@@ -1,5 +1,5 @@
 ### Build Stage
-FROM node:10 AS build
+FROM node:24 AS build
 ENV NODE_ENV=development
 WORKDIR /app
 COPY ["package.json", "yarn.lock", "./"]
@@ -11,7 +11,7 @@ RUN yarn build
 
 
 ### Test Stage
-FROM node:10 AS test
+FROM node:24 AS test
 ENV NODE_ENV=test
 WORKDIR /app
 COPY [".", "./"]
@@ -20,7 +20,7 @@ CMD ["yarn", "test"]
 
 
 ### Final
-FROM node:10-alpine
+FROM node:24-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 COPY ["package.json", "yarn.lock", "./"]
