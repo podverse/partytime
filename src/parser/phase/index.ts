@@ -84,6 +84,7 @@ const feeds: FeedUpdate[] = [
   phase4.liveItem,
 
   phase5.block,
+  phase5.socialInteractChannel,
 
   phase6.txt,
   phase6.remoteItem,

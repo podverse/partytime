@@ -190,6 +190,8 @@ export interface FeedObject extends BasicFeed {
   chat?: Phase7Chat;
   podcastPublisher?: Phase7Publisher;
 
+  /** Channel-level podcast:socialInteract (same shape as item podcastSocialInteraction). */
+  channelPodcastSocialInteract?: Phase5SocialInteract[];
   // #region Pending Phase
   /** PENDING AND LIKELY TO CHANGE indicates a listing on multiple platforms, directories, hosts, apps and services. */
   podcastId?: PhasePendingPodcastId[];
