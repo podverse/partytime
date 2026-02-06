@@ -177,5 +177,45 @@ describe("phase 7", () => {
       );
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
+    it("extracts optional itemGuid, title, and medium from publisher remoteItem", () => {
+      const publisherBlock = `<podcast:publisher>
+          <podcast:remoteItem medium="publisher" feedGuid="003af0a0-6a45-55bf-b765-68e3d349551a" feedUrl="https://agilesetmedia.com/assets/static/feeds/publisher.xml" itemGuid="a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d" title="AgileSet Media Publisher"/>
+      </podcast:publisher>`;
+      const result = helpers.parseValidFeed(helpers.spliceFeed(feed, publisherBlock));
+
+      expect(result.podcastPublisher).toHaveProperty(
+        "feedGuid",
+        "003af0a0-6a45-55bf-b765-68e3d349551a"
+      );
+      expect(result.podcastPublisher).toHaveProperty(
+        "feedUrl",
+        "https://agilesetmedia.com/assets/static/feeds/publisher.xml"
+      );
+      expect(result.podcastPublisher).toHaveProperty(
+        "itemGuid",
+        "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
+      );
+      expect(result.podcastPublisher).toHaveProperty("title", "AgileSet Media Publisher");
+      expect(result.podcastPublisher).toHaveProperty("medium", "publisher");
+      expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
+    it("parses minimal publisher remoteItem without itemGuid or title", () => {
+      const publisherBlock = `<podcast:publisher>
+          <podcast:remoteItem medium="publisher" feedGuid="003af0a0-6a45-55bf-b765-68e3d349551a" feedUrl="https://agilesetmedia.com/assets/static/feeds/publisher.xml"/>
+      </podcast:publisher>`;
+      const result = helpers.parseValidFeed(helpers.spliceFeed(feed, publisherBlock));
+
+      expect(result.podcastPublisher).toHaveProperty(
+        "feedGuid",
+        "003af0a0-6a45-55bf-b765-68e3d349551a"
+      );
+      expect(result.podcastPublisher).toHaveProperty(
+        "feedUrl",
+        "https://agilesetmedia.com/assets/static/feeds/publisher.xml"
+      );
+      expect(result.podcastPublisher?.itemGuid).toBeUndefined();
+      expect(result.podcastPublisher?.title).toBeUndefined();
+      expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
   });
 });
