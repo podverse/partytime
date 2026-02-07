@@ -225,6 +225,22 @@ export const podcastImages = {
 };
 addSubTag("liveItem", podcastImages);
 
+export const contentLink = {
+  phase: 4,
+  tag: "podcast:contentLink",
+  name: "contentLink",
+  nodeTransform: ensureArray,
+  supportCheck: (node: XmlNode[]): boolean => Array.isArray(node) && node.length > 0,
+  fn(node: XmlNode[]): { contentLinks: Phase4ContentLink[] } {
+    return {
+      contentLinks: node.map((n) => ({
+        title: getText(n),
+        url: getAttribute(n, "href") ?? "",
+      })),
+    };
+  },
+};
+
 function getContentLinks(node: XmlNode): Phase4ContentLink[] {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   return ensureArray(node["podcast:contentLink"]).map((cln) => ({
@@ -257,7 +273,7 @@ export type Phase4PodcastLiveItemItem = Pick<Episode, "title" | "guid" | "enclos
     /** PENDING AND LIKELY TO CHANGE */
     liveUpdates?: PhasePendingLiveUpdates;
   };
-type Phase4ContentLink = {
+export type Phase4ContentLink = {
   url: string;
   title: string;
 };

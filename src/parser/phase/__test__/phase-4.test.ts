@@ -832,4 +832,52 @@ describe("phase 4", () => {
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
   });
+
+  describe("contentLink", () => {
+    const supportedName = "contentLink";
+
+    it("parses single podcast:contentLink on item", () => {
+      const contentLinkBlock = `
+      <podcast:contentLink href="https://www.youtube.com/watch?v=example">Watch on YouTube</podcast:contentLink>`;
+      const result = helpers.parseValidFeed(helpers.spliceFirstItem(feed, contentLinkBlock));
+      invariant(result.items);
+      const [firstItem] = result.items;
+      expect(firstItem.contentLinks).toHaveLength(1);
+      expect(firstItem.contentLinks?.[0]).toHaveProperty(
+        "url",
+        "https://www.youtube.com/watch?v=example"
+      );
+      expect(firstItem.contentLinks?.[0]).toHaveProperty("title", "Watch on YouTube");
+      expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
+
+    it("parses multiple podcast:contentLink on item", () => {
+      const contentLinkBlock = `
+      <podcast:contentLink href="https://www.youtube.com/watch?v=one">Watch on YouTube</podcast:contentLink>
+      <podcast:contentLink href="https://open.spotify.com/episode/two">Listen on Spotify</podcast:contentLink>`;
+      const result = helpers.parseValidFeed(helpers.spliceFirstItem(feed, contentLinkBlock));
+      invariant(result.items);
+      const [firstItem] = result.items;
+      expect(firstItem.contentLinks).toHaveLength(2);
+      expect(firstItem.contentLinks?.[0]).toHaveProperty(
+        "url",
+        "https://www.youtube.com/watch?v=one"
+      );
+      expect(firstItem.contentLinks?.[0]).toHaveProperty("title", "Watch on YouTube");
+      expect(firstItem.contentLinks?.[1]).toHaveProperty(
+        "url",
+        "https://open.spotify.com/episode/two"
+      );
+      expect(firstItem.contentLinks?.[1]).toHaveProperty("title", "Listen on Spotify");
+      expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
+
+    it("does not add contentLinks when item has no podcast:contentLink", () => {
+      const result = helpers.parseValidFeed(feed);
+      invariant(result.items);
+      const [firstItem] = result.items;
+      expect(firstItem.contentLinks).toBeUndefined();
+      expect(helpers.getPhaseSupport(result, phase)).not.toContain(supportedName);
+    });
+  });
 });

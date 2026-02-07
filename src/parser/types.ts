@@ -255,6 +255,7 @@ export interface Episode {
   // #endregion
   // #region Phase 4
   value?: Phase4Value;
+  contentLinks?: Array<{ url: string; title: string }>;
   // #endregion
   // #region Phase 5
   podcastSocialInteraction?: Phase5SocialInteract[];

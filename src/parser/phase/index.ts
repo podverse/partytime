@@ -113,6 +113,7 @@ const items: ItemUpdate[] = [
 
   phase4.value,
   phase4.podcastImages,
+  phase4.contentLink,
 
   phase5.socialInteraction,
 
