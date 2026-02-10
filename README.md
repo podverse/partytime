@@ -96,4 +96,4 @@ The sample feeds below were chosen for their varied nature. Including things lik
 
 ## Development
 
-Update dependencies (person enum and valid license list) via `yarn deps` or `npm run deps`.
+Update dependencies (person enum and valid license list) via `npm run deps`.

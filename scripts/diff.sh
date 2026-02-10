@@ -12,7 +12,7 @@ fi
 
 cd "${PROJECT_DIR}"
 
-yarn dev $1
+npm run dev -- $1
 
 NODE_STR="console.log(JSON.stringify(require('./raw/list.json').find(x => x.uri === '$1' || x.uriHash === '$1')))"
 
@@ -27,8 +27,8 @@ echo "${TITLE} => ${URI}"
 
 node src/orig.js ${URI_HASH}
 
-yarn prettier --write results/orig.json
-yarn prettier --write "results/${PARSED}"
+npx prettier --write results/orig.json
+npx prettier --write "results/${PARSED}"
 
 echo "raw/${URI_HASH}.txt"
 
