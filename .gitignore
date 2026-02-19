@@ -121,3 +121,6 @@ src/parser/__test__/fixtures/podcastindex_feeds.db
 raw/
 
 .DS_Store
+
+# direnv / nix-direnv cache
+.direnv
