@@ -285,6 +285,145 @@ describe("phase 4", () => {
 
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
+
+    describe("metaBoost", () => {
+      it("parses podcast:metaBoost on feed-level value block", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:metaBoost type="lightning" schema="boostbox">http://localhost:8080/boost</podcast:metaBoost>
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="100"
+        />
+      </podcast:value>
+      `
+        );
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+        invariant(result.value);
+
+        expect(result.value.metaBoost).toBeDefined();
+        expect(result.value.metaBoost).toHaveProperty("type", "lightning");
+        expect(result.value.metaBoost).toHaveProperty("schema", "boostbox");
+        expect(result.value.metaBoost).toHaveProperty("node", "http://localhost:8080/boost");
+        expect(result.value.metaBoost).not.toHaveProperty("license");
+      });
+
+      it("parses podcast:metaBoost with optional license attribute", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:metaBoost type="lightning" schema="boostbox" license="MIT">https://boost.example.com/boost</podcast:metaBoost>
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="100"
+        />
+      </podcast:value>
+      `
+        );
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+        invariant(result.value);
+
+        expect(result.value.metaBoost).toHaveProperty("license", "MIT");
+        expect(result.value.metaBoost).toHaveProperty("node", "https://boost.example.com/boost");
+      });
+
+      it("parses podcast:metaBoost on item-level value block", () => {
+        const xml = helpers.spliceFirstItem(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.1">
+        <podcast:metaBoost type="lightning" schema="boostbox">http://localhost:8080/boost</podcast:metaBoost>
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="100"
+        />
+      </podcast:value>
+      `
+        );
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+        const [firstItem] = result.items;
+        invariant(firstItem.value);
+
+        expect(firstItem.value.metaBoost).toBeDefined();
+        expect(firstItem.value.metaBoost).toHaveProperty("type", "lightning");
+        expect(firstItem.value.metaBoost).toHaveProperty("schema", "boostbox");
+        expect(firstItem.value.metaBoost).toHaveProperty("node", "http://localhost:8080/boost");
+      });
+
+      it("omits metaBoost when type is missing", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:metaBoost schema="boostbox">http://localhost:8080/boost</podcast:metaBoost>
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="100"
+        />
+      </podcast:value>
+      `
+        );
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+        invariant(result.value);
+
+        expect(result.value).toHaveProperty("type", "lightning");
+        expect(result.value).toHaveProperty("recipients");
+        expect(result.value.metaBoost).toBeUndefined();
+      });
+
+      it("omits metaBoost when schema is missing", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:metaBoost type="lightning">http://localhost:8080/boost</podcast:metaBoost>
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="100"
+        />
+      </podcast:value>
+      `
+        );
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+        invariant(result.value);
+
+        expect(result.value.metaBoost).toBeUndefined();
+      });
+
+      it("omits metaBoost when node text is empty", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:metaBoost type="lightning" schema="boostbox">   </podcast:metaBoost>
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="100"
+        />
+      </podcast:value>
+      `
+        );
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+        invariant(result.value);
+
+        expect(result.value.metaBoost).toBeUndefined();
+      });
+    });
   });
 
   describe("podcast:medium", () => {
