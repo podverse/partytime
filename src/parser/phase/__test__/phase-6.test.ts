@@ -107,13 +107,13 @@ describe("phase 6", () => {
         )
       );
       const [firstItem] = result.items;
-      expect(firstItem).toHaveProperty("value");
-      invariant(firstItem.value);
-      expect(firstItem.value.recipients).toHaveLength(2);
-      expect(firstItem.value).toHaveProperty("valueTimeSplits");
-      invariant(firstItem.value.valueTimeSplits);
-      expect(firstItem.value.valueTimeSplits).toHaveLength(2);
-      const [firstSplit, secondSplit] = firstItem.value.valueTimeSplits;
+      expect(firstItem.values).toHaveLength(1);
+      invariant(firstItem.values?.[0]);
+      expect(firstItem.values?.[0].recipients).toHaveLength(2);
+      expect(firstItem.values?.[0]).toHaveProperty("valueTimeSplits");
+      invariant(firstItem.values?.[0].valueTimeSplits);
+      expect(firstItem.values?.[0].valueTimeSplits).toHaveLength(2);
+      const [firstSplit, secondSplit] = firstItem.values[0].valueTimeSplits;
 
       expect(firstSplit).toHaveProperty("startTime", 60);
       expect(firstSplit).toHaveProperty("duration", 237);
@@ -183,13 +183,13 @@ describe("phase 6", () => {
       expect(result.podcastLiveItems).toHaveLength(1);
       const [lit] = result.podcastLiveItems ?? [];
       invariant(lit);
-      expect(lit).toHaveProperty("value");
-      invariant(lit.value);
-      expect(lit.value.recipients).toHaveLength(1);
-      expect(lit.value).toHaveProperty("valueTimeSplits");
-      invariant(lit.value.valueTimeSplits);
-      expect(lit.value.valueTimeSplits).toHaveLength(2);
-      const [firstSplit, secondSplit] = lit.value.valueTimeSplits;
+      expect(lit.values).toHaveLength(1);
+      invariant(lit.values?.[0]);
+      expect(lit.values?.[0].recipients).toHaveLength(1);
+      expect(lit.values?.[0]).toHaveProperty("valueTimeSplits");
+      invariant(lit.values?.[0].valueTimeSplits);
+      expect(lit.values?.[0].valueTimeSplits).toHaveLength(2);
+      const [firstSplit, secondSplit] = lit.values[0].valueTimeSplits;
 
       expect(firstSplit).toHaveProperty("startTime", 60);
       expect(firstSplit).toHaveProperty("duration", 237);
@@ -250,14 +250,14 @@ describe("phase 6", () => {
         )
       );
       const [firstItem] = result.items;
-      expect(firstItem).toHaveProperty("value");
-      invariant(firstItem.value);
-      expect(firstItem.value.recipients).toHaveLength(2);
-      expect(firstItem.value).toHaveProperty("valueTimeSplits");
-      invariant(firstItem.value.valueTimeSplits);
-      expect(firstItem.value.valueTimeSplits).toHaveLength(2);
+      expect(firstItem.values).toHaveLength(1);
+      invariant(firstItem.values?.[0]);
+      expect(firstItem.values?.[0].recipients).toHaveLength(2);
+      expect(firstItem.values?.[0]).toHaveProperty("valueTimeSplits");
+      invariant(firstItem.values?.[0].valueTimeSplits);
+      expect(firstItem.values?.[0].valueTimeSplits).toHaveLength(2);
 
-      const [firstSplit, secondSplit] = firstItem.value.valueTimeSplits;
+      const [firstSplit, secondSplit] = firstItem.values[0].valueTimeSplits;
 
       invariant(firstSplit.type === "recipients");
       expect(firstSplit).toHaveProperty("startTime", 60);

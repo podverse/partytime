@@ -174,7 +174,8 @@ export interface FeedObject extends BasicFeed {
   guid?: string;
   // #endregion
   // #region Phase 4
-  value?: Phase4Value;
+  /** All parsed podcast:value blocks at channel level */
+  values?: Phase4Value[];
   podcastLiveItems?: Phase4PodcastLiveItem[];
   // #endregion
   // #region Phase 5
@@ -254,7 +255,8 @@ export interface Episode {
   alternativeEnclosures?: Phase3AltEnclosure[];
   // #endregion
   // #region Phase 4
-  value?: Phase4Value;
+  /** All parsed podcast:value blocks at item level */
+  values?: Phase4Value[];
   contentLinks?: Array<{ url: string; title: string }>;
   // #endregion
   // #region Phase 5

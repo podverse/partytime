@@ -20,8 +20,11 @@ import type { BasicFeed, Episode, FeedObject, FeedType, PhaseUpdate, XmlNode } f
 import { updateFeed, updateItem } from "./phase";
 import { handleItem, isValidItem } from "./item";
 import { handleFeed } from "./feed";
-import type { Phase4Value } from "./phase/phase-4";
 import { Phase2SeasonNumber } from "./phase/phase-2";
+
+function asFeedObject(f: BasicFeed): FeedObject {
+  return f as FeedObject;
+}
 
 export type ParserOptions = {
   allowMissingGuid?: boolean;
@@ -66,6 +69,8 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
   feedObj = mergeWith(concat, feedObj, feedResult.feedUpdate);
   phaseSupport = mergeDeepRight(phaseSupport, feedResult.phaseUpdate);
 
+  const feed = asFeedObject(feedObj);
+
   //------------------------------------------------------------------------
   // Are there even any items to get
   if (typeof theFeed.rss.channel.item !== "undefined") {
@@ -83,9 +88,9 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
         newFeedItem = mergeWith(concat, newFeedItem, itemResult.itemUpdate);
         phaseSupport = mergeDeepRight(phaseSupport, itemResult.phaseUpdate);
 
-        // Value Block Fallback
-        if (!newFeedItem.value && "value" in feedObj && feedObj.value) {
-          newFeedItem.value = feedObj.value as Phase4Value;
+        // Value Block Fallback: item has no values, use channel values
+        if (!newFeedItem.values?.length && feed.values?.length) {
+          newFeedItem.values = feed.values;
         }
 
         return newFeedItem;
@@ -105,6 +110,16 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
     );
   } else {
     logger.warn("Provided feed has no items to parse.");
+  }
+
+  // Value Block Fallback: liveItem has no values, use channel values
+  if (feed.podcastLiveItems?.length && feed.values?.length) {
+    feed.podcastLiveItems.forEach((_, i) => {
+      const liveItem = feed.podcastLiveItems?.[i];
+      if (liveItem && !liveItem.values?.length) {
+        liveItem.values = feed.values;
+      }
+    });
   }
 
   if (feedObj.newestItemPubDate && !feedObj.pubDate) {

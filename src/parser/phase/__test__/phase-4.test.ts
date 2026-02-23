@@ -98,14 +98,15 @@ describe("phase 4", () => {
       );
 
       const assertBlockProperties = (block: FeedObject | Episode): void => {
-        expect(block.value).toHaveProperty("type", "lightning");
-        expect(block.value).toHaveProperty("method", "keysend");
-        expect(block.value).toHaveProperty("suggested", 0.00000015);
-        invariant(block.value);
+        const v = block.values?.[0];
+        expect(v).toHaveProperty("type", "lightning");
+        expect(v).toHaveProperty("method", "keysend");
+        expect(v).toHaveProperty("suggested", 0.00000015);
+        invariant(v);
 
-        expect(block.value.recipients).toHaveLength(4);
+        expect(v.recipients).toHaveLength(4);
 
-        const [r1, r2, r3, r4] = block.value.recipients;
+        const [r1, r2, r3, r4] = v.recipients;
         assertAlice(r1);
         assertBob(r2);
         assertCarol(r3);
@@ -114,7 +115,7 @@ describe("phase 4", () => {
 
       const result = helpers.parseValidFeed(xml);
       invariant(result);
-      expect(result).toHaveProperty("value");
+      expect(result.values).toHaveLength(1);
       assertBlockProperties(result);
 
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
@@ -157,32 +158,33 @@ describe("phase 4", () => {
       invariant(result);
 
       const assertBlockProperties = (block: FeedObject | Episode): void => {
-        expect(block.value).toHaveProperty("type", "lightning");
-        expect(block.value).toHaveProperty("method", "keysend");
-        expect(block.value).toHaveProperty("suggested", 0.00000015);
+        const v = block.values?.[0];
+        expect(v).toHaveProperty("type", "lightning");
+        expect(v).toHaveProperty("method", "keysend");
+        expect(v).toHaveProperty("suggested", 0.00000015);
       };
 
-      expect(result).toHaveProperty("value");
+      expect(result.values).toHaveLength(1);
       assertBlockProperties(result);
-      expect(result.value?.recipients).toHaveLength(1);
-      assertAlice(result.value?.recipients[0]);
+      expect(result.values?.[0]?.recipients).toHaveLength(1);
+      assertAlice(result.values?.[0]?.recipients[0]);
 
       const [first, second, third] = result.items;
-      expect(first).toHaveProperty("value");
+      expect(first.values).toHaveLength(1);
       assertBlockProperties(first);
-      expect(first.value?.recipients).toHaveLength(2);
-      assertAlice(first.value?.recipients[0]);
-      assertBob(first.value?.recipients[1]);
+      expect(first.values?.[0]?.recipients).toHaveLength(2);
+      assertAlice(first.values?.[0]?.recipients[0]);
+      assertBob(first.values?.[0]?.recipients[1]);
 
-      expect(second).toHaveProperty("value");
+      expect(second.values).toHaveLength(1);
       assertBlockProperties(second);
-      expect(second.value?.recipients).toHaveLength(1);
-      assertAlice(second.value?.recipients[0]);
+      expect(second.values?.[0]?.recipients).toHaveLength(1);
+      assertAlice(second.values?.[0]?.recipients[0]);
 
-      expect(third).toHaveProperty("value");
+      expect(third.values).toHaveLength(1);
       assertBlockProperties(third);
-      expect(third.value?.recipients).toHaveLength(1);
-      assertAlice(third.value?.recipients[0]);
+      expect(third.values?.[0]?.recipients).toHaveLength(1);
+      assertAlice(third.values?.[0]?.recipients[0]);
 
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
@@ -211,23 +213,24 @@ describe("phase 4", () => {
       invariant(result);
 
       const assertBlockProperties = (block: FeedObject | Episode): void => {
-        expect(block.value).toHaveProperty("type", "lightning");
-        expect(block.value).toHaveProperty("method", "keysend");
-        expect(block.value).toHaveProperty("suggested", 0.1);
+        const v = block.values?.[0];
+        expect(v).toHaveProperty("type", "lightning");
+        expect(v).toHaveProperty("method", "keysend");
+        expect(v).toHaveProperty("suggested", 0.1);
       };
 
-      expect(result).not.toHaveProperty("value");
+      expect(result.values).toBeUndefined();
 
       const [first, second, third] = result.items;
-      expect(first).toHaveProperty("value");
+      expect(first.values).toHaveLength(1);
       assertBlockProperties(first);
-      expect(first.value?.recipients).toHaveLength(2);
-      assertAlice(first.value?.recipients[0]);
-      assertBob(first.value?.recipients[1]);
+      expect(first.values?.[0]?.recipients).toHaveLength(2);
+      assertAlice(first.values?.[0]?.recipients[0]);
+      assertBob(first.values?.[0]?.recipients[1]);
 
-      expect(second).not.toHaveProperty("value");
+      expect(second.values).toBeUndefined();
 
-      expect(third).not.toHaveProperty("value");
+      expect(third.values).toBeUndefined();
 
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
@@ -259,13 +262,14 @@ describe("phase 4", () => {
       );
 
       const assertBlockProperties = (block: FeedObject | Episode): void => {
-        expect(block.value).toHaveProperty("type", "lightning");
-        expect(block.value).toHaveProperty("method", "keysend");
-        expect(block.value).toHaveProperty("suggested", 0.00000015);
+        const v = block.values?.[0];
+        expect(v).toHaveProperty("type", "lightning");
+        expect(v).toHaveProperty("method", "keysend");
+        expect(v).toHaveProperty("suggested", 0.00000015);
 
-        expect(block.value?.recipients).toHaveLength(3);
+        expect(v?.recipients).toHaveLength(3);
 
-        const [r1, r2, r3] = block.value?.recipients ?? [];
+        const [r1, r2, r3] = v?.recipients ?? [];
         assertAlice(r1);
         assertBob(r2);
         assertCarol(r3);
@@ -273,17 +277,120 @@ describe("phase 4", () => {
 
       const result = helpers.parseValidFeed(xml);
       invariant(result);
-      expect(result).toHaveProperty("value");
+      expect(result.values).toHaveLength(1);
 
       const [first, second, third] = result.items;
-      expect(first).toHaveProperty("value");
+      expect(first.values).toHaveLength(1);
       assertBlockProperties(first);
-      expect(second).toHaveProperty("value");
+      expect(second.values).toHaveLength(1);
       assertBlockProperties(second);
-      expect(third).toHaveProperty("value");
+      expect(third.values).toHaveLength(1);
       assertBlockProperties(third);
 
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
+
+    describe("multiple value blocks", () => {
+      it("parses multiple feed-level podcast:value blocks into values array", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="40"
+        />
+      </podcast:value>
+      <podcast:value type="lightning" method="lnaddress" suggested="0.00000020000">
+        <podcast:valueRecipient
+            name="Alice LN"
+            type="lnaddress"
+            address="alice@example.com"
+            split="100"
+        />
+      </podcast:value>
+      `
+        );
+
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+
+        expect(result.values).toHaveLength(2);
+
+        const [keysendBlock, lnaddressBlock] = result.values ?? [];
+        expect(keysendBlock).toHaveProperty("type", "lightning");
+        expect(keysendBlock).toHaveProperty("method", "keysend");
+        expect(keysendBlock).toHaveProperty("suggested", 0.00000015);
+        expect(keysendBlock.recipients).toHaveLength(1);
+        expect(keysendBlock.recipients[0]).toHaveProperty("type", "node");
+        expect(keysendBlock.recipients[0]).toHaveProperty("name", "Alice (Podcaster)");
+
+        expect(lnaddressBlock).toHaveProperty("type", "lightning");
+        expect(lnaddressBlock).toHaveProperty("method", "lnaddress");
+        expect(lnaddressBlock).toHaveProperty("suggested", 0.0000002);
+        expect(lnaddressBlock.recipients).toHaveLength(1);
+        expect(lnaddressBlock.recipients[0]).toHaveProperty("type", "lnaddress");
+        expect(lnaddressBlock.recipients[0]).toHaveProperty("address", "alice@example.com");
+
+        expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+      });
+
+      it("parses multiple item-level podcast:value blocks into values array", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:valueRecipient name="Alice" type="node" address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52" split="40" />
+      </podcast:value>
+      `
+        );
+        const xmlWithTwoItemValues = helpers.spliceFirstItem(
+          xml,
+          `<podcast:value type="lightning" method="keysend" suggested="0.1">
+        <podcast:valueRecipient name="Alice" type="node" address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52" split="50" />
+      </podcast:value>
+      <podcast:value type="lightning" method="lnaddress" suggested="0.15">
+        <podcast:valueRecipient name="Bob LN" type="lnaddress" address="bob@example.com" split="100" />
+      </podcast:value>
+      `
+        );
+
+        const result = helpers.parseValidFeed(xmlWithTwoItemValues);
+        invariant(result);
+
+        const [firstItem] = result.items;
+        invariant(firstItem);
+        expect(firstItem.values).toHaveLength(2);
+
+        const [itemKeysend, itemLnaddress] = firstItem.values ?? [];
+        expect(itemKeysend).toHaveProperty("method", "keysend");
+        expect(itemKeysend.recipients[0]).toHaveProperty("type", "node");
+        expect(itemLnaddress).toHaveProperty("method", "lnaddress");
+        expect(itemLnaddress.recipients[0]).toHaveProperty("type", "lnaddress");
+        expect(itemLnaddress.recipients[0]).toHaveProperty("address", "bob@example.com");
+
+        expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+      });
+
+      it("single value block populates values array", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="40"
+        />
+      </podcast:value>
+      `
+        );
+        const result = helpers.parseValidFeed(xml);
+        invariant(result);
+
+        expect(result.values).toHaveLength(1);
+        expect(result.values?.[0]).toHaveProperty("method", "keysend");
+      });
     });
 
     describe("metaBoost", () => {
@@ -303,13 +410,13 @@ describe("phase 4", () => {
         );
         const result = helpers.parseValidFeed(xml);
         invariant(result);
-        invariant(result.value);
+        invariant(result.values?.[0]);
 
-        expect(result.value.metaBoost).toBeDefined();
-        expect(result.value.metaBoost).toHaveProperty("type", "lightning");
-        expect(result.value.metaBoost).toHaveProperty("schema", "boostbox");
-        expect(result.value.metaBoost).toHaveProperty("node", "http://localhost:8080/boost");
-        expect(result.value.metaBoost).not.toHaveProperty("license");
+        expect(result.values?.[0].metaBoost).toBeDefined();
+        expect(result.values?.[0].metaBoost).toHaveProperty("type", "lightning");
+        expect(result.values?.[0].metaBoost).toHaveProperty("schema", "boostbox");
+        expect(result.values?.[0].metaBoost).toHaveProperty("node", "http://localhost:8080/boost");
+        expect(result.values?.[0].metaBoost).not.toHaveProperty("license");
       });
 
       it("parses podcast:metaBoost with optional license attribute", () => {
@@ -328,10 +435,13 @@ describe("phase 4", () => {
         );
         const result = helpers.parseValidFeed(xml);
         invariant(result);
-        invariant(result.value);
+        invariant(result.values?.[0]);
 
-        expect(result.value.metaBoost).toHaveProperty("license", "MIT");
-        expect(result.value.metaBoost).toHaveProperty("node", "https://boost.example.com/boost");
+        expect(result.values?.[0].metaBoost).toHaveProperty("license", "MIT");
+        expect(result.values?.[0].metaBoost).toHaveProperty(
+          "node",
+          "https://boost.example.com/boost"
+        );
       });
 
       it("parses podcast:metaBoost on item-level value block", () => {
@@ -351,12 +461,15 @@ describe("phase 4", () => {
         const result = helpers.parseValidFeed(xml);
         invariant(result);
         const [firstItem] = result.items;
-        invariant(firstItem.value);
+        invariant(firstItem.values?.[0]);
 
-        expect(firstItem.value.metaBoost).toBeDefined();
-        expect(firstItem.value.metaBoost).toHaveProperty("type", "lightning");
-        expect(firstItem.value.metaBoost).toHaveProperty("schema", "boostbox");
-        expect(firstItem.value.metaBoost).toHaveProperty("node", "http://localhost:8080/boost");
+        expect(firstItem.values?.[0].metaBoost).toBeDefined();
+        expect(firstItem.values?.[0].metaBoost).toHaveProperty("type", "lightning");
+        expect(firstItem.values?.[0].metaBoost).toHaveProperty("schema", "boostbox");
+        expect(firstItem.values?.[0].metaBoost).toHaveProperty(
+          "node",
+          "http://localhost:8080/boost"
+        );
       });
 
       it("omits metaBoost when type is missing", () => {
@@ -375,11 +488,11 @@ describe("phase 4", () => {
         );
         const result = helpers.parseValidFeed(xml);
         invariant(result);
-        invariant(result.value);
+        invariant(result.values?.[0]);
 
-        expect(result.value).toHaveProperty("type", "lightning");
-        expect(result.value).toHaveProperty("recipients");
-        expect(result.value.metaBoost).toBeUndefined();
+        expect(result.values?.[0]).toHaveProperty("type", "lightning");
+        expect(result.values?.[0]).toHaveProperty("recipients");
+        expect(result.values?.[0].metaBoost).toBeUndefined();
       });
 
       it("omits metaBoost when schema is missing", () => {
@@ -398,9 +511,9 @@ describe("phase 4", () => {
         );
         const result = helpers.parseValidFeed(xml);
         invariant(result);
-        invariant(result.value);
+        invariant(result.values?.[0]);
 
-        expect(result.value.metaBoost).toBeUndefined();
+        expect(result.values?.[0].metaBoost).toBeUndefined();
       });
 
       it("omits metaBoost when node text is empty", () => {
@@ -419,9 +532,9 @@ describe("phase 4", () => {
         );
         const result = helpers.parseValidFeed(xml);
         invariant(result);
-        invariant(result.value);
+        invariant(result.values?.[0]);
 
-        expect(result.value.metaBoost).toBeUndefined();
+        expect(result.values?.[0].metaBoost).toBeUndefined();
       });
     });
   });
@@ -859,10 +972,10 @@ describe("phase 4", () => {
       expect(lit).toHaveProperty("start", new Date("2021-09-26T07:30:00.000-0600"));
       expect(lit).toHaveProperty("end", new Date("2021-09-26T08:30:00.000-0600"));
 
-      expect(lit).toHaveProperty("value");
-      expect(lit.value).toHaveProperty("type", "lightning");
-      expect(lit.value).toHaveProperty("method", "keysend");
-      expect(lit.value).toHaveProperty("suggested", 0.00000015);
+      expect(lit.values).toHaveLength(1);
+      expect(lit.values?.[0]).toHaveProperty("type", "lightning");
+      expect(lit.values?.[0]).toHaveProperty("method", "keysend");
+      expect(lit.values?.[0]).toHaveProperty("suggested", 0.00000015);
 
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
