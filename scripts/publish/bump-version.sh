@@ -46,6 +46,7 @@ echo -e "${YELLOW}Bumping version to $VERSION on branch '$CURRENT_BRANCH'...${NC
 npm version "$VERSION" --no-git-tag-version
 
 git add package.json
+[[ -f package-lock.json ]] && git add package-lock.json
 git commit --no-verify -m "chore: bump version to $VERSION"
 git tag -a "v$VERSION" -m "Release v$VERSION"
 
