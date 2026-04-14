@@ -26,6 +26,7 @@ import {
   PhasePendingPodcastId,
   PhasePendingSocial,
   PhasePendingPodcastRecommendation,
+  PhasePendingMetaBoost,
   PhasePendingGateway,
 } from "./phase/phase-pending";
 
@@ -174,6 +175,7 @@ export interface FeedObject extends BasicFeed {
   guid?: string;
   // #endregion
   // #region Phase 4
+  metaBoost?: PhasePendingMetaBoost;
   /** All parsed podcast:value blocks at channel level */
   values?: Phase4Value[];
   podcastLiveItems?: Phase4PodcastLiveItem[];

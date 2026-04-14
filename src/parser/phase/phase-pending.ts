@@ -3,11 +3,14 @@ import {
   extractOptionalFloatAttribute,
   extractOptionalIntegerAttribute,
   extractOptionalStringAttribute,
+  firstIfArray,
   getAttribute,
   getKnownAttribute,
   getText,
+  normalizeHttpUrl,
 } from "../shared";
 import type { XmlNode } from "../types";
+import type { ParserOptions } from "../unified";
 import { logger } from "../../logger";
 
 import { addSubTag } from "./helpers";
@@ -113,6 +116,50 @@ export const social = {
 
         return acc;
       }, []),
+    };
+  },
+};
+
+export type PhasePendingMetaBoost = {
+  standard: string;
+  node: string;
+};
+
+export const metaBoost = {
+  phase: Infinity,
+  tag: "podcast:metaBoost",
+  name: "metaBoost",
+  nodeTransform: firstIfArray,
+  supportCheck: (_node: XmlNode, _type: XmlNodeSource, options?: ParserOptions): boolean => {
+    const standard = getAttribute(_node, "standard");
+    const nodeText = getText(_node);
+    const normalizedNode = nodeText
+      ? normalizeHttpUrl(nodeText.trim(), options?.allowInsecureHTTPMetaboost)
+      : null;
+    return Boolean(standard?.trim()) && Boolean(normalizedNode);
+  },
+  fn(
+    node: XmlNode,
+    _feed: unknown,
+    _type: XmlNodeSource,
+    options?: ParserOptions
+  ): {
+    metaBoost: PhasePendingMetaBoost;
+  } {
+    const standard = getAttribute(node, "standard")?.trim() ?? "";
+    const nodeText = getText(node);
+    const normalizedNode = nodeText
+      ? normalizeHttpUrl(nodeText.trim(), options?.allowInsecureHTTPMetaboost)
+      : null;
+    if (!standard || !normalizedNode) {
+      throw new Error("Unable to extract pending metaBoost; supportCheck needs to be updated");
+    }
+
+    return {
+      metaBoost: {
+        standard,
+        node: normalizedNode,
+      },
     };
   },
 };

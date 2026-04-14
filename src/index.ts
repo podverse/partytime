@@ -1,5 +1,6 @@
 export { parseFeed } from "./parser";
 export { checkFeedByObject, checkFeedByUri } from "./cor";
+export type { ParserOptions } from "./parser/unified";
 export { FeedType, ItunesFeedType, FeedObject, Enclosure, Episode } from "./parser/types";
 export { ItunesEpisodeType } from "./parser/item";
 export {
@@ -25,5 +26,9 @@ export {
   isServiceBlocked,
 } from "./parser/phase/phase-5";
 export { Phase6TxtEntry } from "./parser/phase/phase-6";
-export { PhasePendingPodcastId, PhasePendingSocial } from "./parser/phase/phase-pending";
+export {
+  PhasePendingPodcastId,
+  PhasePendingSocial,
+  PhasePendingMetaBoost,
+} from "./parser/phase/phase-pending";
 export { PersonRole, PersonGroup } from "./parser/person-enum";

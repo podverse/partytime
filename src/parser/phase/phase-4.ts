@@ -3,7 +3,6 @@ import { logger } from "../../logger";
 import {
   ensureArray,
   extractOptionalFloatAttribute,
-  firstIfArray,
   getAttribute,
   getKnownAttribute,
   getText,
@@ -43,14 +42,6 @@ export type Phase4Value = {
   suggested?: string;
   recipients: Phase4ValueRecipient[];
   valueTimeSplits?: Phase6ValueTimeSplit[];
-  metaBoost?: Phase4MetaBoost;
-};
-
-export type Phase4MetaBoost = {
-  type: string;
-  schema: string;
-  license?: string;
-  node: string;
 };
 
 export type Phase4ValueRecipient = {
@@ -107,35 +98,6 @@ export const value = {
   },
 };
 addSubTag("liveItem", value);
-
-export const metaBoost = {
-  phase: 4,
-  tag: "podcast:metaBoost",
-  name: "metaBoost",
-  nodeTransform: firstIfArray,
-  supportCheck: (node: XmlNode): boolean => {
-    const type = getAttribute(node, "type");
-    const schema = getAttribute(node, "schema");
-    const nodeText = getText(node);
-    return Boolean(type?.trim()) && Boolean(schema?.trim()) && Boolean(nodeText?.trim());
-  },
-  fn(node: XmlNode): { metaBoost: Phase4MetaBoost } {
-    const type = getAttribute(node, "type")?.trim() ?? "";
-    const schema = getAttribute(node, "schema")?.trim() ?? "";
-    const licenseRaw = getAttribute(node, "license")?.trim();
-    const nodeText = getText(node)?.trim() ?? "";
-
-    return {
-      metaBoost: {
-        type,
-        schema,
-        ...(licenseRaw ? { license: licenseRaw } : {}),
-        node: nodeText,
-      },
-    };
-  },
-};
-addSubTag("value", metaBoost);
 
 /**
  * https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#medium

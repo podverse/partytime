@@ -33,6 +33,22 @@ export function sanitizeUrl(url?: string) {
   return newUrl;
 }
 
+export function isAllowedHttpUrlProtocol(url: URL, allowInsecureHttp?: boolean): boolean {
+  if (url.protocol === "https:") {
+    return true;
+  }
+  return allowInsecureHttp === true && url.protocol === "http:";
+}
+
+export function normalizeHttpUrl(value: string, allowInsecureHttp?: boolean): string | null {
+  try {
+    const parsed = new URL(value);
+    return isAllowedHttpUrlProtocol(parsed, allowInsecureHttp) ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 // Test for non-latin
 function containsNonLatinCodepoints(s: string) {
   // eslint-disable-next-line no-control-regex

@@ -28,6 +28,7 @@ function asFeedObject(f: BasicFeed): FeedObject {
 
 export type ParserOptions = {
   allowMissingGuid?: boolean;
+  allowInsecureHTTPMetaboost?: boolean;
 };
 
 function handlePodcastSeasons(feedObj: BasicFeed) {
@@ -65,7 +66,7 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
   let phaseSupport: PhaseUpdate = {};
 
   // Feed Phase Support
-  const feedResult = updateFeed(theFeed);
+  const feedResult = updateFeed(theFeed, undefined, options);
   feedObj = mergeWith(concat, feedObj, feedResult.feedUpdate);
   phaseSupport = mergeDeepRight(phaseSupport, feedResult.phaseUpdate);
 
@@ -84,7 +85,7 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
         let newFeedItem: Episode = handleItem(item, feedObj);
 
         // Item Phase Support
-        const itemResult = updateItem(item, theFeed);
+        const itemResult = updateItem(item, theFeed, undefined, options);
         newFeedItem = mergeWith(concat, newFeedItem, itemResult.itemUpdate);
         phaseSupport = mergeDeepRight(phaseSupport, itemResult.phaseUpdate);
 

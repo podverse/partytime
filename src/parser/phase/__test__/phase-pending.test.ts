@@ -194,6 +194,107 @@ describe("phase pending", () => {
     });
   });
 
+  describe("podcast:metaBoost", () => {
+    const supportedName = "metaBoost";
+
+    it("parses channel-level podcast:metaBoost", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `<podcast:metaBoost standard="mb1">https://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>`
+      );
+      const result = helpers.parseValidFeed(xml);
+
+      expect(result.metaBoost).toBeDefined();
+      expect(result.metaBoost).toHaveProperty("standard", "mb1");
+      expect(result.metaBoost).toHaveProperty(
+        "node",
+        "https://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/"
+      );
+      expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
+
+    it("parses channel-level podcast:metaBoost with any standard string", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `<podcast:metaBoost standard="my-custom-standard-v3">https://boost.example.com/boost</podcast:metaBoost>`
+      );
+      const result = helpers.parseValidFeed(xml);
+
+      expect(result.metaBoost).toHaveProperty("standard", "my-custom-standard-v3");
+      expect(result.metaBoost).toHaveProperty("node", "https://boost.example.com/boost");
+      expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
+
+    it("does not parse podcast:metaBoost nested inside podcast:value", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
+        <podcast:metaBoost standard="mb1">https://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>
+        <podcast:valueRecipient
+            name="Alice (Podcaster)"
+            type="node"
+            address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52"
+            split="100"
+        />
+      </podcast:value>
+      `
+      );
+      const result = helpers.parseValidFeed(xml);
+
+      expect(result.metaBoost).toBeUndefined();
+      expect(helpers.getPhaseSupport(result, phase)).not.toContain(supportedName);
+    });
+
+    it("omits channel-level podcast:metaBoost when standard is missing", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `<podcast:metaBoost>https://boost.example.com/boost</podcast:metaBoost>`
+      );
+      const result = helpers.parseValidFeed(xml);
+
+      expect(result.metaBoost).toBeUndefined();
+      expect(helpers.getPhaseSupport(result, phase)).not.toContain(supportedName);
+    });
+
+    it("omits channel-level podcast:metaBoost when node text is missing", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `<podcast:metaBoost standard="mb1"></podcast:metaBoost>`
+      );
+      const result = helpers.parseValidFeed(xml);
+
+      expect(result.metaBoost).toBeUndefined();
+      expect(helpers.getPhaseSupport(result, phase)).not.toContain(supportedName);
+    });
+
+    it("omits channel-level podcast:metaBoost when node URL is http by default", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `<podcast:metaBoost standard="mb1">http://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>`
+      );
+      const result = helpers.parseValidFeed(xml);
+
+      expect(result.metaBoost).toBeUndefined();
+      expect(helpers.getPhaseSupport(result, phase)).not.toContain(supportedName);
+    });
+
+    it("parses http node URL when allowInsecureHTTPMetaboost is enabled", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `<podcast:metaBoost standard="mb1">http://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>`
+      );
+      const result = helpers.parseValidFeed(xml, { allowInsecureHTTPMetaboost: true });
+
+      expect(result.metaBoost).toBeDefined();
+      expect(result.metaBoost).toHaveProperty("standard", "mb1");
+      expect(result.metaBoost).toHaveProperty(
+        "node",
+        "http://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/"
+      );
+      expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+    });
+  });
+
   describe("podcast:recommendations", () => {
     const supportedName = "recommendations";
 
