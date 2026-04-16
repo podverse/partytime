@@ -200,15 +200,15 @@ describe("phase pending", () => {
     it("parses channel-level podcast:metaBoost", () => {
       const xml = helpers.spliceFeed(
         feed,
-        `<podcast:metaBoost standard="mb1">https://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>`
+        `<podcast:metaBoost standard="mbrss-v1">https://api.metaboost.cc/v1/s/mbrss-v1/boost/JAyJS6QnNV/</podcast:metaBoost>`
       );
       const result = helpers.parseValidFeed(xml);
 
       expect(result.metaBoost).toBeDefined();
-      expect(result.metaBoost).toHaveProperty("standard", "mb1");
+      expect(result.metaBoost).toHaveProperty("standard", "mbrss-v1");
       expect(result.metaBoost).toHaveProperty(
         "node",
-        "https://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/"
+        "https://api.metaboost.cc/v1/s/mbrss-v1/boost/JAyJS6QnNV/"
       );
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
@@ -229,7 +229,7 @@ describe("phase pending", () => {
       const xml = helpers.spliceFeed(
         feed,
         `<podcast:value type="lightning" method="keysend" suggested="0.00000015000">
-        <podcast:metaBoost standard="mb1">https://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>
+        <podcast:metaBoost standard="mbrss-v1">https://api.metaboost.cc/v1/s/mbrss-v1/boost/JAyJS6QnNV/</podcast:metaBoost>
         <podcast:valueRecipient
             name="Alice (Podcaster)"
             type="node"
@@ -259,7 +259,7 @@ describe("phase pending", () => {
     it("omits channel-level podcast:metaBoost when node text is missing", () => {
       const xml = helpers.spliceFeed(
         feed,
-        `<podcast:metaBoost standard="mb1"></podcast:metaBoost>`
+        `<podcast:metaBoost standard="mbrss-v1"></podcast:metaBoost>`
       );
       const result = helpers.parseValidFeed(xml);
 
@@ -270,7 +270,7 @@ describe("phase pending", () => {
     it("omits channel-level podcast:metaBoost when node URL is http by default", () => {
       const xml = helpers.spliceFeed(
         feed,
-        `<podcast:metaBoost standard="mb1">http://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>`
+        `<podcast:metaBoost standard="mbrss-v1">http://api.metaboost.cc/v1/s/mbrss-v1/boost/JAyJS6QnNV/</podcast:metaBoost>`
       );
       const result = helpers.parseValidFeed(xml);
 
@@ -281,15 +281,15 @@ describe("phase pending", () => {
     it("parses http node URL when allowInsecureHTTPMetaboost is enabled", () => {
       const xml = helpers.spliceFeed(
         feed,
-        `<podcast:metaBoost standard="mb1">http://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/</podcast:metaBoost>`
+        `<podcast:metaBoost standard="mbrss-v1">http://api.metaboost.cc/v1/s/mbrss-v1/boost/JAyJS6QnNV/</podcast:metaBoost>`
       );
       const result = helpers.parseValidFeed(xml, { allowInsecureHTTPMetaboost: true });
 
       expect(result.metaBoost).toBeDefined();
-      expect(result.metaBoost).toHaveProperty("standard", "mb1");
+      expect(result.metaBoost).toHaveProperty("standard", "mbrss-v1");
       expect(result.metaBoost).toHaveProperty(
         "node",
-        "http://api.metaboost.cc/v1/s/mb1/boost/JAyJS6QnNV/"
+        "http://api.metaboost.cc/v1/s/mbrss-v1/boost/JAyJS6QnNV/"
       );
       expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
     });
