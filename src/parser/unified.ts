@@ -29,6 +29,8 @@ function asFeedObject(f: BasicFeed): FeedObject {
 export type ParserOptions = {
   allowMissingGuid?: boolean;
   allowInsecureHTTPMetaboost?: boolean;
+  /** Max UTF-8 bytes for the XML string. When set, overrides PARSER_MAX_FEED_BODY_BYTES and the 10 MiB default. */
+  maxFeedBodyBytes?: number;
 };
 
 function handlePodcastSeasons(feedObj: BasicFeed) {

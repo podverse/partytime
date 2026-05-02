@@ -1,3 +1,4 @@
+export { DEFAULT_MAX_FEED_BODY_BYTES } from "./config";
 export { parseFeed } from "./parser";
 export { checkFeedByObject, checkFeedByUri } from "./cor";
 export type { ParserOptions } from "./parser/unified";
