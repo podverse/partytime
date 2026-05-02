@@ -5,7 +5,7 @@ import { XmlNode } from "./types";
 
 // Allow feeds with many XML entity expansions (e.g. 1064) while still guarding against
 // entity expansion (XML bomb) attacks. Default in fast-xml-parser is 1000.
-const ENTITY_EXPANSION_LIMIT = 50000;
+const ENTITY_EXPANSION_LIMIT = 100000;
 
 const parserOptions = {
   attributeNamePrefix: "@_",

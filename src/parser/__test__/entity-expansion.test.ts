@@ -35,4 +35,18 @@ describe("entity expansion limit", () => {
     expect(result?.items).toHaveLength(1);
     expect(result?.items?.[0]).toHaveProperty("title", "Item");
   });
+
+  it("parses RSS with more than 50000 entity expansions", () => {
+    const entityRef = "&amp; ";
+    const count = 50001;
+    const descriptionContent = entityRef.repeat(count);
+    const xml = minimalRssPrefix + descriptionContent + minimalRssSuffix;
+
+    const result = parseFeed(xml, { allowMissingGuid: true });
+
+    expect(result).not.toBeNull();
+    expect(result).toHaveProperty("title", "Entity expansion test");
+    expect(result?.items).toHaveLength(1);
+    expect(result?.items?.[0]).toHaveProperty("title", "Item");
+  });
 });
