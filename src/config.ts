@@ -22,8 +22,8 @@ const defaultLevel = new Map([
 
 const localDevelopmentLogFallback = isLocalDev ? defaultLevel.get(environment) : undefined;
 
-/** Default max UTF-8 byte length for RSS/XML passed to parseFeed (10 MiB). */
-export const DEFAULT_MAX_FEED_BODY_BYTES = 10 * 1024 * 1024;
+/** Default max UTF-8 byte length for RSS/XML passed to parseFeed (20 MiB). */
+export const DEFAULT_MAX_FEED_BODY_BYTES = 20 * 1024 * 1024;
 
 const PARSER_MAX_FEED_BODY_BYTES_MIN = 1000;
 const PARSER_MAX_FEED_BODY_BYTES_MAX = 50_000_000;
