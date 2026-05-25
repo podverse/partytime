@@ -18,13 +18,19 @@ const parserOptions = {
   parseAttributeValue: false,
   trimValues: true,
   parseTrueNumberOnly: false,
-  tagValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
+  tagValueProcessor: (_tagName: string, tagValue: string) => {
+    if (_tagName === "itunes:summary") {
+      return tagValue;
+    }
+    return he.decode(tagValue);
+  },
   attributeValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
   stopNodes: ["parse-me-as-string"],
   processEntities: {
     enabled: true,
     maxEntityCount: ENTITY_EXPANSION_LIMIT,
     maxTotalExpansions: ENTITY_EXPANSION_LIMIT,
+    tagFilter: (tagName: string) => tagName !== "itunes:summary",
   },
 };
 

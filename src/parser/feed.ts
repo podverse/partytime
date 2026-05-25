@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import he from "he";
+
 import { logger } from "../logger";
 
 import {
@@ -18,6 +20,7 @@ import {
 import { BasicFeed, ItunesFeedType } from "./types";
 import type { FeedType, XmlNode } from "./types";
 import { categoryLookup } from "./itunes-categories";
+import type { ParserOptions } from "./unified";
 
 function getTitle(feed: XmlNode): string {
   const node = firstWithValue(feed.title);
@@ -85,7 +88,7 @@ function getSummary(feed: XmlNode): undefined | { summary: string } {
   if (node) {
     const nodeValue = getText(node);
     if (nodeValue) {
-      return { summary: sanitizeMultipleSpaces(sanitizeNewLines(nodeValue)) };
+      return { summary: sanitizeMultipleSpaces(sanitizeNewLines(he.decode(nodeValue))) };
     }
   }
   return undefined;
@@ -627,7 +630,7 @@ function getTimeToLive(feed: XmlNode): undefined | { ttl: number } {
   return undefined;
 }
 
-export function handleFeed(feed: XmlNode, feedType: FeedType): BasicFeed {
+export function handleFeed(feed: XmlNode, feedType: FeedType, options?: ParserOptions): BasicFeed {
   return {
     lastUpdate: new Date(),
     type: feedType,
@@ -650,7 +653,7 @@ export function handleFeed(feed: XmlNode, feedType: FeedType): BasicFeed {
     ...getAuthor(feed),
     ...getOwner(feed),
     ...getImage(feed),
-    ...getSummary(feed),
+    ...(options?.includeItunesSummary ? getSummary(feed) : undefined),
     ...getSubtitle(feed),
     ...getItunesTitle(feed),
     ...getCopyright(feed),
