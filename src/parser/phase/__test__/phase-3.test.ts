@@ -276,10 +276,7 @@ describe("phase 3", () => {
       expect(altEnclosure).toHaveProperty("length", 0);
       expect(altEnclosure).toHaveProperty("height", 720);
       expect(altEnclosure?.source).toHaveLength(1);
-      expect(altEnclosure?.source[0]).toHaveProperty(
-        "uri",
-        "https://example.com/track.mp4"
-      );
+      expect(altEnclosure?.source[0]).toHaveProperty("uri", "https://example.com/track.mp4");
       expect(altEnclosure?.source[0]).toHaveProperty("contentType", "video/mp4");
 
       expect(helpers.getPhaseSupport(result, 3)).toContain("alternateEnclosure");
