@@ -16,6 +16,7 @@ import * as phase4 from "./phase-4";
 import * as phase5 from "./phase-5";
 import * as phase6 from "./phase-6";
 import * as phase7 from "./phase-7";
+import * as phase8 from "./phase-8";
 import * as pending from "./phase-pending";
 import { XmlNodeSource } from "./types";
 
@@ -99,6 +100,8 @@ const feeds: FeedUpdate[] = [
   phase7.podcastChat,
   phase7.podcastPublisher,
 
+  phase8.podcastImage,
+
   pending.metaBoost,
   pending.id,
   pending.social,
@@ -127,6 +130,8 @@ const items: ItemUpdate[] = [
   phase6.txt,
 
   phase7.podcastChat,
+
+  phase8.podcastImage,
 
   pending.podcastRecommendations,
   pending.podcastGateway,

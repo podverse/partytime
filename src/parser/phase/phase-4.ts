@@ -272,6 +272,7 @@ export type Phase4PodcastLiveItemItem = Pick<Episode, "title" | "guid" | "enclos
       | "podcastPeople"
       | "alternativeEnclosures"
       | "podcastImages"
+      | "podcastImage"
       | "values"
     >
   > & {
