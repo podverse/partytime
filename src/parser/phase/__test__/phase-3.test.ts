@@ -256,6 +256,35 @@ describe("phase 3", () => {
       expect(helpers.getPhaseSupport(result, 3)).toContain("alternateEnclosure");
     });
 
+    it("extracts alternate enclosure without length attribute", () => {
+      const xml = helpers.spliceFirstItem(
+        feed,
+        `<podcast:alternateEnclosure type="video/mp4" height="720">
+        <podcast:source uri="https://example.com/track.mp4"/>
+    </podcast:alternateEnclosure>`
+      );
+
+      const result = helpers.parseValidFeed(xml);
+
+      const [first] = result.items;
+
+      expect(first).toHaveProperty("alternativeEnclosures");
+      expect(first.alternativeEnclosures).toHaveLength(1);
+
+      const [altEnclosure] = first.alternativeEnclosures ?? [];
+      expect(altEnclosure).toHaveProperty("type", "video/mp4");
+      expect(altEnclosure).toHaveProperty("length", 0);
+      expect(altEnclosure).toHaveProperty("height", 720);
+      expect(altEnclosure?.source).toHaveLength(1);
+      expect(altEnclosure?.source[0]).toHaveProperty(
+        "uri",
+        "https://example.com/track.mp4"
+      );
+      expect(altEnclosure?.source[0]).toHaveProperty("contentType", "video/mp4");
+
+      expect(helpers.getPhaseSupport(result, 3)).toContain("alternateEnclosure");
+    });
+
     it("extracts multiple alternate enclosures", () => {
       const xml = helpers.spliceFirstItem(
         feed,
@@ -284,7 +313,7 @@ describe("phase 3", () => {
       const [first] = result.items;
 
       expect(first).toHaveProperty("alternativeEnclosures");
-      expect(first.alternativeEnclosures).toHaveLength(2);
+      expect(first.alternativeEnclosures).toHaveLength(3);
       expect(first.alternativeEnclosures?.[0]).not.toHaveProperty("integrity");
       expect(first.alternativeEnclosures?.[0]).toHaveProperty("default", false);
       expect(first.alternativeEnclosures?.[0]).toHaveProperty("type", "video/mp4");
@@ -324,6 +353,19 @@ describe("phase 3", () => {
         "https://noagendatube.com/lazy-static/torrents/301929e6-a83e-45ad-8901-e513ea1ab81e-0.torrent"
       );
       expect(s2Second).toHaveProperty("contentType", "application/x-bittorrent");
+
+      expect(first.alternativeEnclosures?.[2]).not.toHaveProperty("integrity");
+      expect(first.alternativeEnclosures?.[2]).toHaveProperty("default", false);
+      expect(first.alternativeEnclosures?.[2]).toHaveProperty("type", "application/x-mpegURL");
+      expect(first.alternativeEnclosures?.[2]).toHaveProperty("length", 0);
+      expect(first.alternativeEnclosures?.[2]?.source[0]).toHaveProperty(
+        "uri",
+        "https://noagendatube.com/static/streaming-playlists/hls/301929e6-a83e-45ad-8901-e513ea1ab81e/master.m3u8"
+      );
+      expect(first.alternativeEnclosures?.[2]?.source[0]).toHaveProperty(
+        "contentType",
+        "application/x-mpegURL"
+      );
 
       expect(helpers.getPhaseSupport(result, 3)).toContain("alternateEnclosure");
     });
