@@ -1415,6 +1415,25 @@ describe("item handling", () => {
       expect(first).toHaveProperty("description", "<p>bye</p>");
     });
 
+    it("decodes itunes:summary only when it is used as a fallback", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <itunes:summary>&lt;p&gt;bye&lt;/p&gt;</itunes:summary>
+          <guid isPermaLink="true">https://example.com/ep0003</guid>
+          <enclosure url="https://aphid.fireside.fm/d/1437767933/65632ad5-59b2-4e30-82d1-13845dce07dd/d11384ea-69b5-4e33-bd0e-5d33fdba8a0d.mp3" length="78034115" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml);
+      const [first] = result.items;
+
+      expect(first).toHaveProperty("description", "<p>bye</p>");
+      expect(first).not.toHaveProperty("summary");
+    });
+
     it("prefers content:encoded value when falling back", () => {
       const xml = helpers.spliceFeed(
         feed,
@@ -1441,7 +1460,7 @@ describe("item handling", () => {
   });
 
   describe("summary", () => {
-    it("extracts the value", () => {
+    it("ignores the deprecated value by default", () => {
       const xml = helpers.spliceFeed(
         feed,
         `
@@ -1455,6 +1474,25 @@ describe("item handling", () => {
       );
 
       const result = parseFeed(xml);
+      const [first] = result.items;
+
+      expect(first).not.toHaveProperty("summary");
+    });
+
+    it("extracts the value when requested", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <itunes:summary>
+          <![CDATA[ <p>bye</p> ]]>
+          </itunes:summary>          <guid isPermaLink="true">https://example.com/ep0003</guid>
+          <enclosure url="https://aphid.fireside.fm/d/1437767933/65632ad5-59b2-4e30-82d1-13845dce07dd/d11384ea-69b5-4e33-bd0e-5d33fdba8a0d.mp3" length="78034115" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml, { includeItunesSummary: true });
       const [first] = result.items;
 
       expect(first).toHaveProperty("summary", "<p>bye</p>");
@@ -1473,7 +1511,7 @@ describe("item handling", () => {
         `
       );
 
-      const result = parseFeed(xml);
+      const result = parseFeed(xml, { includeItunesSummary: true });
       const [first] = result.items;
 
       expect(first).toHaveProperty("summary", "bye");

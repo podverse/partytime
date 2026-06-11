@@ -31,6 +31,8 @@ export type ParserOptions = {
   allowInsecureHTTPMetaboost?: boolean;
   /** Max UTF-8 bytes for the XML string. When set, overrides PARSER_MAX_FEED_BODY_BYTES and the 10 MiB default. */
   maxFeedBodyBytes?: number;
+  /** Include deprecated itunes:summary fields as summary properties. Description fallback still uses itunes:summary when needed. */
+  includeItunesSummary?: boolean;
 };
 
 function handlePodcastSeasons(feedObj: BasicFeed) {
@@ -63,7 +65,7 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
     return null;
   }
 
-  let feedObj = handleFeed(theFeed.rss.channel, type);
+  let feedObj = handleFeed(theFeed.rss.channel, type, options);
 
   let phaseSupport: PhaseUpdate = {};
 
@@ -84,7 +86,7 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
           return undefined;
         }
 
-        let newFeedItem: Episode = handleItem(item, feedObj);
+        let newFeedItem: Episode = handleItem(item, feedObj, options);
 
         // Item Phase Support
         const itemResult = updateItem(item, theFeed, undefined, options);

@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
+import he from "he";
+
 import { logger } from "../logger";
 
 import {
@@ -23,6 +25,7 @@ import {
 } from "./shared";
 import type { BasicFeed, Enclosure, Episode, XmlNode } from "./types";
 import { unescape } from "./unescape";
+import type { ParserOptions } from "./unified";
 
 export enum ItunesEpisodeType {
   Full = "full",
@@ -292,7 +295,7 @@ function getSummary(item: XmlNode): undefined | { summary: string } {
   if (node) {
     const summaryValue = getText(node);
     if (summaryValue) {
-      return { summary: summaryValue };
+      return { summary: he.decode(summaryValue) };
     }
   }
 
@@ -311,7 +314,7 @@ function getSubtitle(item: XmlNode): undefined | { subtitle: string } {
   return undefined;
 }
 
-export function handleItem(item: XmlNode, _feed: BasicFeed): Episode {
+export function handleItem(item: XmlNode, _feed: BasicFeed, options?: ParserOptions): Episode {
   return {
     guid: getGuid(item),
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -329,7 +332,7 @@ export function handleItem(item: XmlNode, _feed: BasicFeed): Episode {
     ...getKeywords(item),
     ...getPubDate(item),
     ...getImage(item),
-    ...getSummary(item),
+    ...(options?.includeItunesSummary ? getSummary(item) : undefined),
     ...getDescription(item),
     ...getSubtitle(item),
     ...getContent(item),

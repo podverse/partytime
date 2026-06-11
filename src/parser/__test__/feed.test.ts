@@ -142,6 +142,20 @@ describe("feed handling", () => {
       expect(result).toHaveProperty("description", "<p>bye</p>");
     });
 
+    it("decodes itunes:summary only when it is used as a fallback", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+          <itunes:summary>&lt;p&gt;bye&lt;/p&gt;</itunes:summary>
+        `
+      );
+
+      const result = parseFeed(xml);
+
+      expect(result).toHaveProperty("description", "<p>bye</p>");
+      expect(result).not.toHaveProperty("summary");
+    });
+
     it("prefers description value when the fall back exists", () => {
       const xml = helpers.spliceFeed(
         feed,
@@ -173,7 +187,7 @@ describe("feed handling", () => {
   });
 
   describe("summary", () => {
-    it("extracts the value", () => {
+    it("ignores the deprecated value by default", () => {
       const xml = helpers.spliceFeed(
         feed,
         `
@@ -182,6 +196,19 @@ describe("feed handling", () => {
       );
 
       const result = parseFeed(xml);
+
+      expect(result).not.toHaveProperty("summary");
+    });
+
+    it("extracts the value when requested", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+          <itunes:summary>hi</itunes:summary>
+        `
+      );
+
+      const result = parseFeed(xml, { includeItunesSummary: true });
 
       expect(result).toHaveProperty("summary", "hi");
     });
