@@ -107,7 +107,9 @@ export function getAuthor(item: XmlNode): undefined | { author: string } {
 export function getTitle(item: XmlNode): undefined | { title: string } {
   const node = firstWithValue(item.title);
   const fallbackNode = firstWithValue(item["itunes:title"]);
-  const title = sanitizeMultipleSpaces(sanitizeNewLines(getText(node) || getText(fallbackNode)));
+  const title = sanitizeMultipleSpaces(
+    sanitizeNewLines(getTextOrNumber(node) || getTextOrNumber(fallbackNode))
+  );
   if (title) {
     return { title };
   }
@@ -116,11 +118,15 @@ export function getTitle(item: XmlNode): undefined | { title: string } {
 
 export function getItunesTitle(item: XmlNode): undefined | { itunesTitle: string } {
   const node = firstWithValue(item["itunes:title"]);
-  const itunesTitle = sanitizeMultipleSpaces(sanitizeNewLines(getText(node)));
+  const itunesTitle = sanitizeMultipleSpaces(sanitizeNewLines(getTextOrNumber(node)));
   if (itunesTitle) {
     return { itunesTitle };
   }
   return undefined;
+}
+
+function getTextOrNumber(node: XmlNode | null): string {
+  return getText(node) || `${getNumber(node) ?? ""}`;
 }
 
 export function getDescription(item: XmlNode): undefined | { description: string } {
