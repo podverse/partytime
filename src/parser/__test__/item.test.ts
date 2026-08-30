@@ -169,6 +169,25 @@ describe("item handling", () => {
       expect(first).toHaveProperty("title", "Test 123");
     });
 
+    it("extracts numeric title node text", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <title>911</title>
+          <guid isPermaLink="true">https://example.com/ep0911</guid>
+          <enclosure url="https://mp3s.nashownotes.com/PC20-17-2020-12-25-Final.mp3" length="76606111" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml);
+      const [first] = result.items;
+
+      expect(result.items).toHaveLength(1);
+      expect(first).toHaveProperty("title", "911");
+    });
+
     it("extracts first title node text", () => {
       const xml = helpers.spliceFeed(
         feed,
@@ -242,6 +261,26 @@ describe("item handling", () => {
       const [first] = result.items;
 
       expect(first).toHaveProperty("title", "Test 345");
+    });
+
+    it("falls back to numeric itunes:title node text", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <itunes:title>345</itunes:title>
+          <guid isPermaLink="true">https://example.com/ep0345</guid>
+          <enclosure url="https://mp3s.nashownotes.com/PC20-17-2020-12-25-Final.mp3" length="76606111" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml);
+      const [first] = result.items;
+
+      expect(result.items).toHaveLength(1);
+      expect(first).toHaveProperty("title", "345");
+      expect(first).toHaveProperty("itunesTitle", "345");
     });
 
     it.skip("sanitizes smart quotes", () => {
