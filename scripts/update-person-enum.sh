@@ -11,6 +11,6 @@ if [[ -f "${PROJECT_DIR}/.env" ]]; then
 fi
 
 curl -o "${SCRIPTS_DIR}/taxonomy.json" https://raw.githubusercontent.com/Podcastindex-org/podcast-namespace/main/taxonomy.json
-yarn esr "${SCRIPTS_DIR}/generate-person-enum.ts"
+npx esr "${SCRIPTS_DIR}/generate-person-enum.ts"
 
 rm "${SCRIPTS_DIR}/taxonomy.json"

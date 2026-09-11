@@ -11,5 +11,5 @@ if [[ -f "${PROJECT_DIR}/.env" ]]; then
 fi
 
 curl -o "${SCRIPTS_DIR}/licenses.json" https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json
-yarn esr "${SCRIPTS_DIR}/generate-json.ts" ./licenses.json ./src/parser/phase/licenses.ts
+npx esr "${SCRIPTS_DIR}/generate-json.ts" ./licenses.json ./src/parser/phase/licenses.ts
 rm -f "${SCRIPTS_DIR}/licenses.json"

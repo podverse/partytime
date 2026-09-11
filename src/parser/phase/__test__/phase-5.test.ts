@@ -13,6 +13,60 @@ describe("phase 5", () => {
   describe("socialInteract", () => {
     const supportedName = "socialInteract";
 
+    describe("channel-level (channelPodcastSocialInteract)", () => {
+      it("extracts channel podcast:socialInteract with spec attributes", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `
+    <podcast:socialInteract protocol="activitypub" uri="https://podcastindex.social/@mitch/116024949309724989" accountId="@mitch" accountUrl="https://podcastindex.social/@mitch" priority="1"/>
+          `
+        );
+        const result = helpers.parseValidFeed(xml);
+
+        expect(result).toHaveProperty("channelPodcastSocialInteract");
+        expect(result.channelPodcastSocialInteract).toHaveLength(1);
+        expect(result.channelPodcastSocialInteract?.[0]).toHaveProperty("platform", "activitypub");
+        expect(result.channelPodcastSocialInteract?.[0]).toHaveProperty("id", "@mitch");
+        expect(result.channelPodcastSocialInteract?.[0]).toHaveProperty(
+          "url",
+          "https://podcastindex.social/@mitch/116024949309724989"
+        );
+        expect(result.channelPodcastSocialInteract?.[0]).toHaveProperty(
+          "profileUrl",
+          "https://podcastindex.social/@mitch"
+        );
+        expect(result.channelPodcastSocialInteract?.[0]).toHaveProperty("priority", 1);
+
+        expect(helpers.getPhaseSupport(result, phase)).toContain(supportedName);
+      });
+
+      it("has no channelPodcastSocialInteract when channel has no podcast:socialInteract", () => {
+        const xml = helpers.spliceFeed(feed, "");
+        const result = helpers.parseValidFeed(xml);
+        expect(result).not.toHaveProperty("channelPodcastSocialInteract");
+      });
+
+      it("extracts multiple channel socialInteract tags", () => {
+        const xml = helpers.spliceFeed(
+          feed,
+          `
+    <podcast:socialInteract protocol="activitypub" uri="https://example.com/post/1" accountId="@user" priority="1"/>
+    <podcast:socialInteract protocol="twitter" uri="https://twitter.com/user/status/1" accountId="@user" priority="2"/>
+          `
+        );
+        const result = helpers.parseValidFeed(xml);
+
+        expect(result.channelPodcastSocialInteract).toHaveLength(2);
+        expect(result.channelPodcastSocialInteract?.[0]).toHaveProperty("platform", "activitypub");
+        expect(result.channelPodcastSocialInteract?.[0]).toHaveProperty(
+          "url",
+          "https://example.com/post/1"
+        );
+        expect(result.channelPodcastSocialInteract?.[1]).toHaveProperty("platform", "twitter");
+        expect(result.channelPodcastSocialInteract?.[1]).toHaveProperty("priority", 2);
+      });
+    });
+
     it("extracts a single interact node", () => {
       const xml = helpers.spliceFirstItem(
         feed,

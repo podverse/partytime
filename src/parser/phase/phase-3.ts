@@ -167,33 +167,32 @@ enum IntegrityType {
   PGP = "pgp-signature",
 }
 const podcastSource = "podcast:source";
+
+function alternateEnclosureSupportCheck(node: unknown): boolean {
+  return (node as XmlNode[]).some((i) => {
+    const type = getAttribute(i, "type");
+    const sourceNodes = ensureArray(i?.[podcastSource] ?? []);
+
+    return (
+      Boolean(type) && sourceNodes.length > 0 && sourceNodes.some((n) => getAttribute(n, "uri"))
+    );
+  });
+}
+
 export const alternativeEnclosure: ItemUpdate = {
   phase: 3,
   tag: "podcast:alternateEnclosure",
   name: "alternateEnclosure",
   nodeTransform: ensureArray,
-  supportCheck: (node) => {
-    return (node as XmlNode[]).some((i) => {
-      const type = getAttribute(i, "type");
-      const length = getAttribute(i, "length");
-      const sourceNodes = ensureArray(i?.[podcastSource] ?? []);
-
-      return (
-        Boolean(type) &&
-        Boolean(length) &&
-        sourceNodes.length > 0 &&
-        sourceNodes.some((n) => getAttribute(n, "uri"))
-      );
-    });
-  },
+  supportCheck: alternateEnclosureSupportCheck,
   fn(node, _feed) {
     const update: Phase3AltEnclosure[] = [];
 
     (node as XmlNode[])
-      .filter((n) => getAttribute(n, "length") && getAttribute(n, "type"))
+      .filter((n) => getAttribute(n, "type"))
       .forEach((altEncNode) => {
         const type = getKnownAttribute(altEncNode, "type");
-        const length = getKnownAttribute(altEncNode, "length");
+        const lengthAttr = getAttribute(altEncNode, "length");
         const sourceUris = ensureArray(altEncNode[podcastSource] ?? [])
           .map((sourceNode) => ({
             uri: getAttribute(sourceNode, "uri"),
@@ -219,10 +218,10 @@ export const alternativeEnclosure: ItemUpdate = {
               }
             : null;
 
-        if (type && length && sourceUris.length > 0) {
+        if (type && sourceUris.length > 0) {
           update.push({
             type,
-            length: parseInt(length, 10),
+            length: lengthAttr ? parseInt(lengthAttr, 10) : 0,
             source: sourceUris,
             default: /^true$/i.test(getAttribute(altEncNode, "default") ?? ""),
             ...(integrity ? { integrity } : undefined),
@@ -245,16 +244,7 @@ export const liveItemAlternativeEnclosure: ItemUpdate = {
   tag: "podcast:alternateEnclosure",
   name: "alternateEnclosure",
   nodeTransform: ensureArray,
-  supportCheck: (node) => {
-    return (node as XmlNode[]).some((i) => {
-      const type = getAttribute(i, "type");
-      const sourceNodes = ensureArray(i?.[podcastSource] ?? []);
-
-      return (
-        Boolean(type) && sourceNodes.length > 0 && sourceNodes.some((n) => getAttribute(n, "uri"))
-      );
-    });
-  },
+  supportCheck: alternateEnclosureSupportCheck,
   fn(node, _feed) {
     const update: Phase3AltEnclosure[] = [];
 

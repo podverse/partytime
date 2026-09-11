@@ -9,7 +9,7 @@ import type { FeedObject, XmlNode } from "../types";
 
 import { XmlNodeSource } from "./types";
 
-import type { FeedUpdate } from "./index";
+import type { FeedUpdate, ItemUpdate } from "./index";
 
 function getSocialPlatform(n: XmlNode): string | null {
   return (getAttribute(n, "platform") || getAttribute(n, "protocol")) ?? null;
@@ -39,7 +39,47 @@ export type Phase5SocialInteract = {
   /** the order of rendering */
   priority?: number;
 };
-export const socialInteraction = {
+function reduceSocialInteractNodes(node: XmlNode[]): Phase5SocialInteract[] {
+  const isValidNode = (n: XmlNode): boolean =>
+    Boolean(getSocialPlatform(n)) && Boolean(getSocialUrl(n));
+  return node.reduce<Phase5SocialInteract[]>((acc, n) => {
+    if (isValidNode(n)) {
+      const profileUrl = getSocialProfileUrl(n);
+      const pubDateText = getAttribute(n, "pubDate");
+      const pubDateAsDate = pubDateText && pubDateToDate(pubDateText);
+      return [
+        ...acc,
+        {
+          platform: getSocialPlatform(n) ?? "",
+          id: getSocialAccount(n) ?? "",
+          url: getSocialUrl(n) ?? "",
+          ...extractOptionalFloatAttribute(n, "priority"),
+          ...(pubDateAsDate ? { pubDate: pubDateAsDate } : undefined),
+          ...(profileUrl ? { profileUrl } : undefined),
+        },
+      ];
+    }
+    return acc;
+  }, []);
+}
+
+/** FeedUpdate: parses channel-level podcast:socialInteract. */
+export const socialInteractChannel: FeedUpdate = {
+  phase: 5,
+  name: "socialInteract",
+  tag: "podcast:socialInteract",
+  nodeTransform: ensureArray,
+  supportCheck: (node: XmlNode[], type: XmlNodeSource): boolean =>
+    type === XmlNodeSource.Feed &&
+    node.some((n) => Boolean(getSocialPlatform(n)) && Boolean(getSocialUrl(n))),
+  fn(node: XmlNode, _feed: unknown, _type: XmlNodeSource): Partial<FeedObject> {
+    return {
+      channelPodcastSocialInteract: reduceSocialInteractNodes(ensureArray(node)),
+    };
+  },
+};
+
+export const socialInteraction: ItemUpdate = {
   phase: 5,
   name: "socialInteract",
   tag: "podcast:socialInteract",
@@ -47,32 +87,8 @@ export const socialInteraction = {
   supportCheck: (node: XmlNode[], type: XmlNodeSource): boolean =>
     type === XmlNodeSource.Item &&
     node.some((n) => Boolean(getSocialPlatform(n)) && Boolean(getSocialUrl(n))),
-  fn(node: XmlNode[]): { podcastSocialInteraction: Phase5SocialInteract[] } {
-    const isValidItemNode = (n: XmlNode): boolean =>
-      Boolean(getSocialPlatform(n)) && Boolean(getSocialUrl(n));
-
-    return {
-      podcastSocialInteraction: node.reduce<Phase5SocialInteract[]>((acc, n) => {
-        if (isValidItemNode(n)) {
-          const profileUrl = getSocialProfileUrl(n);
-          const pubDateText = getAttribute(n, "pubDate");
-          const pubDateAsDate = pubDateText && pubDateToDate(pubDateText);
-          return [
-            ...acc,
-            {
-              platform: getSocialPlatform(n) ?? "",
-              id: getSocialAccount(n) ?? "", // per https://podcastindex.social/@mitch/109821341789189954
-              url: getSocialUrl(n) ?? "",
-              ...extractOptionalFloatAttribute(n, "priority"),
-              ...(pubDateAsDate ? { pubDate: pubDateAsDate } : undefined),
-              ...(profileUrl ? { profileUrl } : undefined),
-            },
-          ];
-        }
-
-        return acc;
-      }, []),
-    };
+  fn(node: XmlNode): { podcastSocialInteraction: Phase5SocialInteract[] } {
+    return { podcastSocialInteraction: reduceSocialInteractNodes(ensureArray(node)) };
   },
 };
 

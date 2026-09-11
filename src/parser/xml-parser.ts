@@ -3,6 +3,9 @@ import he from "he";
 
 import { XmlNode } from "./types";
 
+// Predefined XML entities (&amp;, &lt;, numeric refs) are unlimited. Limits apply
+// only to DOCTYPE-defined entities so large RSS catalogs with escaped HTML still
+// parse, while entity-expansion bombs stay capped.
 const parserOptions = {
   attributeNamePrefix: "@_",
   attributesGroupName: "attr",
@@ -17,6 +20,15 @@ const parserOptions = {
   tagValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
   attributeValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
   stopNodes: ["parse-me-as-string"],
+  processEntities: {
+    enabled: true,
+    appliesTo: "external",
+    maxEntityCount: 100,
+    maxEntitySize: 10000,
+    maxExpansionDepth: 10,
+    maxTotalExpansions: 1000,
+    maxExpandedLength: 100000,
+  },
 };
 
 export function validate(xml: string): true | unknown {

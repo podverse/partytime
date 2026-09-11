@@ -26,6 +26,7 @@ import {
   PhasePendingPodcastId,
   PhasePendingSocial,
   PhasePendingPodcastRecommendation,
+  PhasePendingMetaBoost,
   PhasePendingGateway,
 } from "./phase/phase-pending";
 
@@ -174,7 +175,9 @@ export interface FeedObject extends BasicFeed {
   guid?: string;
   // #endregion
   // #region Phase 4
-  value?: Phase4Value;
+  metaBoost?: PhasePendingMetaBoost;
+  /** All parsed podcast:value blocks at channel level */
+  values?: Phase4Value[];
   podcastLiveItems?: Phase4PodcastLiveItem[];
   // #endregion
   // #region Phase 5
@@ -190,6 +193,8 @@ export interface FeedObject extends BasicFeed {
   chat?: Phase7Chat;
   podcastPublisher?: Phase7Publisher;
 
+  /** Channel-level podcast:socialInteract (same shape as item podcastSocialInteraction). */
+  channelPodcastSocialInteract?: Phase5SocialInteract[];
   // #region Pending Phase
   /** PENDING AND LIKELY TO CHANGE indicates a listing on multiple platforms, directories, hosts, apps and services. */
   podcastId?: PhasePendingPodcastId[];
@@ -252,7 +257,9 @@ export interface Episode {
   alternativeEnclosures?: Phase3AltEnclosure[];
   // #endregion
   // #region Phase 4
-  value?: Phase4Value;
+  /** All parsed podcast:value blocks at item level */
+  values?: Phase4Value[];
+  contentLinks?: Array<{ url: string; title: string }>;
   // #endregion
   // #region Phase 5
   podcastSocialInteraction?: Phase5SocialInteract[];

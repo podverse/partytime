@@ -8,6 +8,8 @@ This package will also identify [new namespace elements](https://github.com/Podc
 
 By default, this will produce log messages that are warnings or errors, but this can be controlled via an environment variable, `PARTYTIME_LOG` can be set to whatever log level you may want.
 
+`parseFeed` rejects XML larger than **20 MiB** (UTF-8 byte length) by default and returns `null`. Override with `maxFeedBodyBytes` in the second argument (integer bytes between 1000 and 50000000), or set **`PARSER_MAX_FEED_BODY_BYTES`** in the environment (same bounds). Resolution order: `maxFeedBodyBytes` → env → default.
+
 ## Usage
 
 ```sh
@@ -96,4 +98,15 @@ The sample feeds below were chosen for their varied nature. Including things lik
 
 ## Development
 
-Update dependencies (person enum and valid license list) via `yarn deps` or `npm run deps`.
+Update dependencies (person enum and valid license list) via `npm run deps`.
+
+## Publishing
+
+From **develop**, after `npm login` if needed:
+
+```bash
+./scripts/publish/release.sh 5.0.15
+```
+
+See [scripts/publish/README.md](scripts/publish/README.md).
+

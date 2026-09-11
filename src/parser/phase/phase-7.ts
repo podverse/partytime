@@ -85,6 +85,9 @@ function getPublisherRemoteItem(node: XmlNode): XmlNode | undefined {
 export type Phase7Publisher = {
   feedGuid: string;
   feedUrl?: string;
+  itemGuid?: string;
+  title?: string;
+  medium?: string;
 };
 export const podcastPublisher = {
   phase: 7,
@@ -102,6 +105,9 @@ export const podcastPublisher = {
       podcastPublisher: {
         feedGuid: getKnownAttribute(publisherItem, "feedGuid"),
         ...extractOptionalStringAttribute(publisherItem, "feedUrl"),
+        ...extractOptionalStringAttribute(publisherItem, "itemGuid"),
+        ...extractOptionalStringAttribute(publisherItem, "title"),
+        ...extractOptionalStringAttribute(publisherItem, "medium"),
       },
     };
   },

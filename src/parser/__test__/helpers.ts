@@ -4,6 +4,7 @@ import * as path from "path";
 import invariant from "tiny-invariant";
 
 import type { FeedObject } from "../types";
+import type { ParserOptions } from "../unified";
 import { parseFeed } from "../index";
 
 export async function loadFixture(name = "example"): Promise<string> {
@@ -60,8 +61,11 @@ function splice(feedXml: string, str: string, after: string, startSearchAt = 0):
   return [feedXml.slice(0, start), str, feedXml.slice(start)].join("");
 }
 
-export function parseValidFeed(xml: string): NonNullable<ReturnType<typeof parseFeed>> {
-  const parsed = parseFeed(xml);
+export function parseValidFeed(
+  xml: string,
+  options?: ParserOptions
+): NonNullable<ReturnType<typeof parseFeed>> {
+  const parsed = parseFeed(xml, options);
 
   invariant(parsed);
   return parsed;

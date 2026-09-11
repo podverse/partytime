@@ -3,7 +3,6 @@ import { logger } from "../../logger";
 import {
   ensureArray,
   extractOptionalFloatAttribute,
-  firstIfArray,
   getAttribute,
   getKnownAttribute,
   getText,
@@ -60,31 +59,41 @@ export type Phase4ValueRecipient = {
   split: number;
   fee: boolean;
 };
+function parseOneValueNode(node: XmlNode): Phase4Value {
+  const item: EmptyObj = {};
+  getSubTags("value").forEach((updater) => {
+    useParser(updater, node, item);
+  });
+  return {
+    type: getKnownAttribute(node, "type"),
+    method: getKnownAttribute(node, "method"),
+    ...extractOptionalFloatAttribute(node, "suggested"),
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    recipients: extractRecipients(ensureArray(node["podcast:valueRecipient"])),
+    ...item,
+  };
+}
+
+function isValidValueNode(node: XmlNode): boolean {
+  return (
+    Boolean(getAttribute(node, "type")) &&
+    Boolean(getAttribute(node, "method")) &&
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    ensureArray(node["podcast:valueRecipient"]).filter(validRecipient).length > 0
+  );
+}
+
 export const value = {
   phase: 4,
   tag: "podcast:value",
   name: "value",
-  nodeTransform: firstIfArray,
-  supportCheck: (node: XmlNode): boolean =>
-    Boolean(getAttribute(node, "type")) &&
-    Boolean(getAttribute(node, "method")) &&
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    ensureArray(node["podcast:valueRecipient"]).filter(validRecipient).length > 0,
-  fn(node: XmlNode): { value: Phase4Value } {
-    const item = {};
-    getSubTags("value").forEach((updater) => {
-      useParser(updater, node, item);
-    });
-
+  nodeTransform: ensureArray,
+  supportCheck: (node: XmlNode | XmlNode[]): boolean =>
+    Array.isArray(node) && node.length > 0 && node.some((n) => isValidValueNode(n)),
+  fn(node: XmlNode | XmlNode[]): { values: Phase4Value[] } {
+    const nodes = ensureArray(node).filter(isValidValueNode);
     return {
-      value: {
-        type: getKnownAttribute(node, "type"),
-        method: getKnownAttribute(node, "method"),
-        ...extractOptionalFloatAttribute(node, "suggested"),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        recipients: extractRecipients(ensureArray(node["podcast:valueRecipient"])),
-        ...item,
-      },
+      values: nodes.map((n) => parseOneValueNode(n)),
     };
   },
 };
@@ -225,6 +234,22 @@ export const podcastImages = {
 };
 addSubTag("liveItem", podcastImages);
 
+export const contentLink = {
+  phase: 4,
+  tag: "podcast:contentLink",
+  name: "contentLink",
+  nodeTransform: ensureArray,
+  supportCheck: (node: XmlNode[]): boolean => Array.isArray(node) && node.length > 0,
+  fn(node: XmlNode[]): { contentLinks: Phase4ContentLink[] } {
+    return {
+      contentLinks: node.map((n) => ({
+        title: getText(n),
+        url: getAttribute(n, "href") ?? "",
+      })),
+    };
+  },
+};
+
 function getContentLinks(node: XmlNode): Phase4ContentLink[] {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   return ensureArray(node["podcast:contentLink"]).map((cln) => ({
@@ -247,7 +272,7 @@ export type Phase4PodcastLiveItemItem = Pick<Episode, "title" | "guid" | "enclos
       | "podcastPeople"
       | "alternativeEnclosures"
       | "podcastImages"
-      | "value"
+      | "values"
     >
   > & {
     // phased in properties assumed to be dynamically added via addSubTag
@@ -257,7 +282,7 @@ export type Phase4PodcastLiveItemItem = Pick<Episode, "title" | "guid" | "enclos
     /** PENDING AND LIKELY TO CHANGE */
     liveUpdates?: PhasePendingLiveUpdates;
   };
-type Phase4ContentLink = {
+export type Phase4ContentLink = {
   url: string;
   title: string;
 };

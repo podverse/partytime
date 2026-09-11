@@ -20,11 +20,17 @@ import type { BasicFeed, Episode, FeedObject, FeedType, PhaseUpdate, XmlNode } f
 import { updateFeed, updateItem } from "./phase";
 import { handleItem, isValidItem } from "./item";
 import { handleFeed } from "./feed";
-import type { Phase4Value } from "./phase/phase-4";
 import { Phase2SeasonNumber } from "./phase/phase-2";
+
+function asFeedObject(f: BasicFeed): FeedObject {
+  return f as FeedObject;
+}
 
 export type ParserOptions = {
   allowMissingGuid?: boolean;
+  allowInsecureHTTPMetaboost?: boolean;
+  /** Max UTF-8 bytes for the XML string. When set, overrides PARSER_MAX_FEED_BODY_BYTES and the 10 MiB default. */
+  maxFeedBodyBytes?: number;
 };
 
 function handlePodcastSeasons(feedObj: BasicFeed) {
@@ -62,9 +68,11 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
   let phaseSupport: PhaseUpdate = {};
 
   // Feed Phase Support
-  const feedResult = updateFeed(theFeed);
+  const feedResult = updateFeed(theFeed, undefined, options);
   feedObj = mergeWith(concat, feedObj, feedResult.feedUpdate);
   phaseSupport = mergeDeepRight(phaseSupport, feedResult.phaseUpdate);
+
+  const feed = asFeedObject(feedObj);
 
   //------------------------------------------------------------------------
   // Are there even any items to get
@@ -79,13 +87,13 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
         let newFeedItem: Episode = handleItem(item, feedObj);
 
         // Item Phase Support
-        const itemResult = updateItem(item, theFeed);
+        const itemResult = updateItem(item, theFeed, undefined, options);
         newFeedItem = mergeWith(concat, newFeedItem, itemResult.itemUpdate);
         phaseSupport = mergeDeepRight(phaseSupport, itemResult.phaseUpdate);
 
-        // Value Block Fallback
-        if (!newFeedItem.value && "value" in feedObj && feedObj.value) {
-          newFeedItem.value = feedObj.value as Phase4Value;
+        // Value Block Fallback: item has no values, use channel values
+        if (!newFeedItem.values?.length && feed.values?.length) {
+          newFeedItem.values = feed.values;
         }
 
         return newFeedItem;
@@ -105,6 +113,16 @@ export function unifiedParser(theFeed: XmlNode, type: FeedType, options?: Parser
     );
   } else {
     logger.warn("Provided feed has no items to parse.");
+  }
+
+  // Value Block Fallback: liveItem has no values, use channel values
+  if (feed.podcastLiveItems?.length && feed.values?.length) {
+    feed.podcastLiveItems.forEach((_, i) => {
+      const liveItem = feed.podcastLiveItems?.[i];
+      if (liveItem && !liveItem.values?.length) {
+        liveItem.values = feed.values;
+      }
+    });
   }
 
   if (feedObj.newestItemPubDate && !feedObj.pubDate) {
