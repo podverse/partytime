@@ -1,6 +1,6 @@
 {
   "name": "podverse-partytime",
-  "version": "5.0.14",
+  "version": "5.0.15",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
