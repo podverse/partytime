@@ -28,7 +28,11 @@ echo ""
 CURRENT_VERSION=$(node -p "require('./package.json').version")
 echo -e "Current version: ${GREEN}$CURRENT_VERSION${NC}"
 echo ""
-read -p "Enter next version (e.g., 5.0.7): " VERSION
+
+VERSION="${1:-}"
+if [[ -z "$VERSION" ]]; then
+  read -r -p "Enter next version (e.g., 5.0.15): " VERSION
+fi
 
 if [[ -z "$VERSION" ]]; then
   echo -e "${RED}Error: No version entered. Aborting.${NC}"

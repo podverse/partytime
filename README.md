@@ -99,3 +99,14 @@ The sample feeds below were chosen for their varied nature. Including things lik
 ## Development
 
 Update dependencies (person enum and valid license list) via `npm run deps`.
+
+## Publishing
+
+From **develop**, after `npm login` if needed:
+
+```bash
+./scripts/publish/release.sh 5.0.15
+```
+
+See [scripts/publish/README.md](scripts/publish/README.md).
+
