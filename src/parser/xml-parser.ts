@@ -3,10 +3,9 @@ import he from "he";
 
 import { XmlNode } from "./types";
 
-// Allow feeds with many XML entity expansions (e.g. 1064) while still guarding against
-// entity expansion (XML bomb) attacks. Default in fast-xml-parser is 1000.
-const ENTITY_EXPANSION_LIMIT = 100000;
-
+// Predefined XML entities (&amp;, &lt;, numeric refs) are unlimited. Limits apply
+// only to DOCTYPE-defined entities so large RSS catalogs with escaped HTML still
+// parse, while entity-expansion bombs stay capped.
 const parserOptions = {
   attributeNamePrefix: "@_",
   attributesGroupName: "attr",
@@ -23,8 +22,12 @@ const parserOptions = {
   stopNodes: ["parse-me-as-string"],
   processEntities: {
     enabled: true,
-    maxEntityCount: ENTITY_EXPANSION_LIMIT,
-    maxTotalExpansions: ENTITY_EXPANSION_LIMIT,
+    appliesTo: "external",
+    maxEntityCount: 100,
+    maxEntitySize: 10000,
+    maxExpansionDepth: 10,
+    maxTotalExpansions: 1000,
+    maxExpandedLength: 100000,
   },
 };
 

@@ -1,10 +1,9 @@
 import { parseFeed } from "../index";
+import { parse } from "../xml-parser";
 
 /**
- * Tests for XML entity expansion limit (issue #140).
- * The parser allows more than the default 1000 expansions so that feeds with many
- * entities (e.g. fountain.fm with 1064) parse successfully, while still capping
- * to avoid XML bomb attacks.
+ * Predefined XML entities in show notes are unlimited. Expansion limits apply
+ * only to DOCTYPE-defined entities.
  */
 describe("entity expansion limit", () => {
   const minimalRssPrefix = `<?xml version="1.0" encoding="UTF-8"?>
@@ -21,8 +20,7 @@ describe("entity expansion limit", () => {
   </channel>
 </rss>`;
 
-  it("parses RSS with more than 1000 entity expansions", () => {
-    // Each &amp; is one entity expansion. 1001 exceeds the default limit of 1000.
+  it("parses RSS with more than 1000 predefined entity expansions", () => {
     const entityRef = "&amp; ";
     const count = 1001;
     const descriptionContent = entityRef.repeat(count);
@@ -36,9 +34,9 @@ describe("entity expansion limit", () => {
     expect(result?.items?.[0]).toHaveProperty("title", "Item");
   });
 
-  it("parses RSS with more than 50000 entity expansions", () => {
+  it("parses RSS with more than 100000 predefined entity expansions", () => {
     const entityRef = "&amp; ";
-    const count = 50001;
+    const count = 100001;
     const descriptionContent = entityRef.repeat(count);
     const xml = minimalRssPrefix + descriptionContent + minimalRssSuffix;
 
@@ -48,5 +46,20 @@ describe("entity expansion limit", () => {
     expect(result).toHaveProperty("title", "Entity expansion test");
     expect(result?.items).toHaveLength(1);
     expect(result?.items?.[0]).toHaveProperty("title", "Item");
+  });
+
+  it("rejects many expansions of a DOCTYPE-defined entity", () => {
+    const refs = "&x;".repeat(1001);
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rss [
+  <!ENTITY x "AAAAAAAAAA">
+]>
+<rss version="2.0">
+  <channel>
+    <title>${refs}</title>
+  </channel>
+</rss>`;
+
+    expect(() => parse(xml)).toThrow(/Entity expansion count limit exceeded/);
   });
 });
