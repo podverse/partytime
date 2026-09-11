@@ -60,6 +60,8 @@ describe("entity expansion limit", () => {
   </channel>
 </rss>`;
 
-    expect(() => parse(xml)).toThrow(/Entity expansion count limit exceeded/);
+    expect(() => {
+      parse(xml);
+    }).toThrow(/Entity expansion count limit exceeded/);
   });
 });
