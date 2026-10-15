@@ -22,6 +22,7 @@ import type {
 import type { Phase5Blocked, Phase5BlockedPlatforms, Phase5SocialInteract } from "./phase/phase-5";
 import type { Phase6RemoteItem, Phase6TxtEntry } from "./phase/phase-6";
 import type { Phase7Chat, Phase7Publisher } from "./phase/phase-7";
+import type { Phase8Follow } from "./phase/phase-8";
 import {
   PhasePendingPodcastId,
   PhasePendingSocial,
@@ -192,6 +193,11 @@ export interface FeedObject extends BasicFeed {
   //
   chat?: Phase7Chat;
   podcastPublisher?: Phase7Publisher;
+
+  // #region Phase 8
+  /** PENDING Phase 8: URL to a JSON document containing podcast follow links. */
+  podcastFollow?: Phase8Follow;
+  // #endregion
 
   /** Channel-level podcast:socialInteract (same shape as item podcastSocialInteraction). */
   channelPodcastSocialInteract?: Phase5SocialInteract[];
