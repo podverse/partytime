@@ -10,7 +10,10 @@ Agent reminder: [AGENTS.md](/AGENTS.md).
 
 ## Prerequisites
 
-- On **develop**, with the release work already committed and a clean working tree.
+- On **develop**. Everything except `release-notes/X.Y.Z.md` is committed. That
+  file may stay uncommitted; the script includes it in the version bump.
+- `release-notes/X.Y.Z.md` exists and is not empty. The script exits if it is
+  missing. npm has no separate notes field; this file is the GitHub release body.
 - Logged in to npm (`npm login` if `npm whoami` fails). This is a **prestep**;
   the release script does not log you in.
 
@@ -23,8 +26,8 @@ npm whoami
 ./scripts/publish/release.sh 5.0.15
 ```
 
-Replace `5.0.15` with the next semver. The script asks you to paste release notes
-(or press Enter to skip), to type `yes` before git writes, and again before
+Replace `5.0.15` with the next semver. Write `release-notes/5.0.15.md` first.
+The script asks you to type `yes` before git writes, and again before
 `npm publish`.
 
 **Dry run** (lint + test + print the plan; no commit, tag, push, merge, or publish):
@@ -35,18 +38,13 @@ Replace `5.0.15` with the next semver. The script asks you to paste release note
 
 ### What release.sh does
 
-1. Checks `npm whoami`, branch (`develop`), clean tree, and that `develop` is
-   not behind or diverged from `origin/develop`.
-2. Asks for release notes. Paste the text, then finish with a line that is only
-   a period (`.`). Press Enter on the first prompt to skip. If
-   `release-notes/X.Y.Z.md` already exists, that file is used and the prompt is
-   skipped.
-3. Runs lint and test, bumps `package.json`, commits (including
-   `release-notes/X.Y.Z.md` when notes were pasted), tags `vX.Y.Z`, pushes
-   **develop** and the tag.
+1. Requires `release-notes/X.Y.Z.md` to exist and contain text. Exits otherwise.
+2. Checks `npm whoami`, branch (`develop`), a clean tree apart from that notes
+   file, and that `develop` is not behind or diverged from `origin/develop`.
+3. Runs lint and test, bumps `package.json`, commits (including the notes file
+   when it is still uncommitted), tags `vX.Y.Z`, pushes **develop** and the tag.
 4. Checks out `main`, fast-forward pulls, `merge --no-ff develop`, pushes `main`.
-5. Checks out the tag. When notes were provided, creates the GitHub release from
-   `release-notes/X.Y.Z.md`. npm has no separate notes field.
+5. Checks out the tag and creates the GitHub release from `release-notes/X.Y.Z.md`.
 6. Runs `npm publish`, then checks out `develop` again.
 
 After publishing, update `podverse-partytime` in the Podverse monorepo to the

@@ -25,11 +25,11 @@ commands instead.
 ## Release notes
 
 Whenever you give the operator publish steps, include suggested release notes for the GitHub
-release. `release.sh` asks them to paste that text (a line containing only `.` ends the paste,
-Enter on the first prompt skips). Pasted notes are committed as `release-notes/X.Y.Z.md` with the
-version bump and become the GitHub release body. npm has no separate notes field. Use
-`release-notes/X.Y.Z.md` when it already exists; otherwise derive them from the
-commits since the last formal tag:
+release. `release.sh` exits unless `release-notes/X.Y.Z.md` exists and contains text. Tell the
+operator to save the suggestion in that file before running the script. The file may stay
+uncommitted; the version bump commit includes it, and it becomes the GitHub release body. npm has
+no separate notes field. When the file already exists, quote it. Otherwise derive the suggestion
+from the commits since the last formal tag:
 
 ```bash
 LAST_TAG="$(git tag --list --sort=-v:refname | rg '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)"
