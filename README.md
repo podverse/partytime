@@ -16,6 +16,9 @@ By default, this will produce log messages that are warnings or errors, but this
 npm install podverse-partytime
 ```
 
+Requires **Node.js 22.12 or newer**. The package is CommonJS and depends on an ESM-only HTML entity
+decoder, which needs `require()` of ES modules.
+
 ### Typescript
 
 ```ts

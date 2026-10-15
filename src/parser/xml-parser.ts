@@ -1,5 +1,5 @@
 import { XMLParser, XMLValidator } from "fast-xml-parser";
-import he from "he";
+import { decode } from "he";
 
 import { XmlNode } from "./types";
 
@@ -17,8 +17,8 @@ const parserOptions = {
   parseAttributeValue: false,
   trimValues: true,
   parseTrueNumberOnly: false,
-  tagValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
-  attributeValueProcessor: (_tagName: string, tagValue: string) => he.decode(tagValue),
+  tagValueProcessor: (_tagName: string, tagValue: string) => decode(tagValue),
+  attributeValueProcessor: (_tagName: string, tagValue: string) => decode(tagValue),
   stopNodes: ["parse-me-as-string"],
   processEntities: {
     enabled: true,
