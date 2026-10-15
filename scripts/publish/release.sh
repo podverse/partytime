@@ -174,10 +174,12 @@ git push origin main
 echo -e "${YELLOW}Checking out $TAG for publish...${NC}"
 git checkout "$TAG"
 
+# Forks that publish to another GitHub repository change this name.
+GITHUB_REPO="podverse/partytime"
 echo -e "${YELLOW}Creating GitHub release $TAG...${NC}"
-if ! gh release create "$TAG" --title "podverse-partytime $VERSION" --notes-file "$NOTES_PATH"; then
+if ! gh release create "$TAG" --repo "$GITHUB_REPO" --title "podverse-partytime $VERSION" --notes-file "$NOTES_PATH"; then
   echo -e "${YELLOW}GitHub release was not created. After npm publish, run:${NC}"
-  echo "  gh release create $TAG --title \"podverse-partytime $VERSION\" --notes-file $NOTES_PATH"
+  echo "  gh release create $TAG --repo $GITHUB_REPO --title \"podverse-partytime $VERSION\" --notes-file $NOTES_PATH"
 fi
 
 confirm "Type yes to publish podverse-partytime@$VERSION to npm"

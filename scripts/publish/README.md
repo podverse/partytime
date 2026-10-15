@@ -44,7 +44,10 @@ The script asks you to type `yes` before git writes, and again before
 3. Runs lint and test, bumps `package.json`, commits (including the notes file
    when it is still uncommitted), tags `vX.Y.Z`, pushes **develop** and the tag.
 4. Checks out `main`, fast-forward pulls, `merge --no-ff develop`, pushes `main`.
-5. Checks out the tag and creates the GitHub release from `release-notes/X.Y.Z.md`.
+5. Checks out the tag and creates the GitHub release on `podverse/partytime` from
+   `release-notes/X.Y.Z.md`. The repository is named in the script, so `gh` does
+   not need a default repo on this machine. A fork that publishes elsewhere
+   changes that name.
 6. Runs `npm publish`, then checks out `develop` again.
 
 After publishing, update `podverse-partytime` in the Podverse monorepo to the
