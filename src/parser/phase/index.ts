@@ -101,6 +101,7 @@ const feeds: FeedUpdate[] = [
   phase7.podcastPublisher,
 
   phase8.podcastFollow,
+  phase8.podcastImage,
 
   pending.metaBoost,
   pending.id,
@@ -130,6 +131,8 @@ const items: ItemUpdate[] = [
   phase6.txt,
 
   phase7.podcastChat,
+
+  phase8.podcastImage,
 
   pending.podcastRecommendations,
   pending.podcastGateway,
