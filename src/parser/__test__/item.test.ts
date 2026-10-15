@@ -188,6 +188,33 @@ describe("item handling", () => {
       expect(first).toHaveProperty("title", "911");
     });
 
+    it("keeps number-like title text exactly as written", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <title>007</title>
+          <itunes:title>1.10</itunes:title>
+          <guid isPermaLink="true">https://example.com/ep0007</guid>
+          <enclosure url="https://mp3s.nashownotes.com/PC20-17-2020-12-25-Final.mp3" length="76606111" type="audio/mpeg"/>
+        </item>
+        <item>
+          <title>1e3</title>
+          <guid isPermaLink="true">https://example.com/ep1000</guid>
+          <enclosure url="https://mp3s.nashownotes.com/PC20-17-2020-12-25-Final.mp3" length="76606111" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml);
+      const [first, second] = result.items;
+
+      expect(result.items).toHaveLength(2);
+      expect(first).toHaveProperty("title", "007");
+      expect(first).toHaveProperty("itunesTitle", "1.10");
+      expect(second).toHaveProperty("title", "1e3");
+    });
+
     it("extracts first title node text", () => {
       const xml = helpers.spliceFeed(
         feed,

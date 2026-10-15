@@ -68,6 +68,19 @@ describe("feed handling", () => {
 
       expect(result).toHaveProperty("title", "Test 123");
     });
+
+    it("keeps number-like title text exactly as written", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+          <title>007</title>
+        `
+      );
+
+      const result = parseFeed(xml);
+
+      expect(result).toHaveProperty("title", "007");
+    });
   });
 
   describe("link", () => {
