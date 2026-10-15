@@ -1,11 +1,14 @@
 {
   "name": "podverse-partytime",
-  "version": "5.0.15",
+  "version": "5.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
   "repository": {
     "url": "https://github.com/podverse/podverse-partytime"
+  },
+  "engines": {
+    "node": ">=22.12"
   },
   "keywords": [
     "podcasting20",
@@ -38,7 +41,7 @@
   },
   "devDependencies": {
     "@types/bytebuffer": "^5.0.42",
-    "@types/he": "^1.1.1",
+    "@types/he": "^1.2.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "@types/node-fetch": "^2.5.8",
@@ -70,7 +73,7 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "fast-xml-parser": "^5.7.1",
-    "he": "^1.2.0",
+    "he": "^2.0.0",
     "node-fetch": "^2.6.1",
     "pino": "^7.0.5",
     "ramda": "^0.27.1",

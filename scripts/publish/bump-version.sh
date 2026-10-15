@@ -51,6 +51,7 @@ npm version "$VERSION" --no-git-tag-version
 
 git add package.json
 [[ -f package-lock.json ]] && git add package-lock.json
+[[ -f "release-notes/${VERSION}.md" ]] && git add "release-notes/${VERSION}.md"
 git commit --no-verify -m "chore: bump version to $VERSION"
 git tag -a "v$VERSION" -m "Release v$VERSION"
 

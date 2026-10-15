@@ -1,7 +1,8 @@
 #!/bin/bash
 # Full release: bump on develop, merge to main (no squash), publish from the tag.
+# Requires release-notes/X.Y.Z.md. That file is the GitHub release body.
 # Prestep: npm login (this script only checks npm whoami).
-# Run from repo root on a clean develop branch.
+# Run from repo root on develop. The notes file may be uncommitted; everything else must be clean.
 # Usage: ./scripts/publish/release.sh 5.0.15
 #        ./scripts/publish/release.sh 5.0.15 --dry-run
 
@@ -63,6 +64,17 @@ confirm() {
   fi
 }
 
+# npm has no separate notes field. This file is committed with the version bump
+# when it is still uncommitted, and it becomes the GitHub release body.
+NOTES_PATH="release-notes/${VERSION}.md"
+
+if [[ ! -f "$NOTES_PATH" ]] || ! grep -q '[^[:space:]]' "$NOTES_PATH"; then
+  echo -e "${RED}Error: $NOTES_PATH is missing or empty.${NC}"
+  echo "Write the release notes in that file, then re-run."
+  exit 1
+fi
+echo -e "${GREEN}Using $NOTES_PATH${NC}"
+
 echo -e "${YELLOW}Checking npm login...${NC}"
 if ! npm whoami >/dev/null 2>&1; then
   echo -e "${RED}Error: not logged in to npm. Run this first:${NC}"
@@ -77,9 +89,20 @@ if [[ "$CURRENT_BRANCH" != "develop" ]]; then
   exit 1
 fi
 
-if [[ -n "$(git status --porcelain)" ]]; then
-  echo -e "${RED}Error: working tree is dirty. Commit or stash first.${NC}"
-  git status --short
+OTHER_DIRTY=0
+while IFS= read -r line; do
+  [[ -z "$line" ]] && continue
+  if [[ "${line:3}" == "$NOTES_PATH" ]]; then
+    continue
+  fi
+  if [[ "$OTHER_DIRTY" -eq 0 ]]; then
+    echo -e "${RED}Error: working tree is dirty. Commit or stash first.${NC}"
+    echo "$NOTES_PATH may stay uncommitted; this script includes it in the version bump."
+  fi
+  OTHER_DIRTY=1
+  echo "$line"
+done < <(git status --porcelain)
+if [[ "$OTHER_DIRTY" -eq 1 ]]; then
   exit 1
 fi
 
@@ -123,10 +146,11 @@ echo -e "Current version: ${GREEN}$CURRENT_VERSION${NC}"
 echo -e "Next version:    ${GREEN}$VERSION${NC}"
 echo ""
 echo "This will:"
-echo "  1. lint + test"
-echo "  2. bump package.json on develop, commit, tag $TAG, push develop + tag"
+echo "  1. lint + test, bump package.json on develop, commit, tag $TAG, push develop + tag"
+echo "  2. include $NOTES_PATH in that commit when it is still uncommitted"
 echo "  3. merge develop into main with a merge commit (no squash) and push main"
-echo "  4. npm publish from $TAG"
+echo "  4. create a GitHub release from $NOTES_PATH"
+echo "  5. npm publish from $TAG"
 echo ""
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
@@ -149,6 +173,12 @@ git push origin main
 
 echo -e "${YELLOW}Checking out $TAG for publish...${NC}"
 git checkout "$TAG"
+
+echo -e "${YELLOW}Creating GitHub release $TAG...${NC}"
+if ! gh release create "$TAG" --title "podverse-partytime $VERSION" --notes-file "$NOTES_PATH"; then
+  echo -e "${YELLOW}GitHub release was not created. After npm publish, run:${NC}"
+  echo "  gh release create $TAG --title \"podverse-partytime $VERSION\" --notes-file $NOTES_PATH"
+fi
 
 confirm "Type yes to publish podverse-partytime@$VERSION to npm"
 

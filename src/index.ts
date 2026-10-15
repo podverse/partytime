@@ -27,6 +27,7 @@ export {
   isServiceBlocked,
 } from "./parser/phase/phase-5";
 export { Phase6TxtEntry } from "./parser/phase/phase-6";
+export { Phase8Follow, Phase8PodcastImage } from "./parser/phase/phase-8";
 export {
   PhasePendingPodcastId,
   PhasePendingSocial,
