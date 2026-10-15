@@ -23,8 +23,9 @@ npm whoami
 ./scripts/publish/release.sh 5.0.15
 ```
 
-Replace `5.0.15` with the next semver. The script asks you to type `yes` before
-git writes, and again before `npm publish`.
+Replace `5.0.15` with the next semver. The script asks you to paste release notes
+(or press Enter to skip), to type `yes` before git writes, and again before
+`npm publish`.
 
 **Dry run** (lint + test + print the plan; no commit, tag, push, merge, or publish):
 
@@ -36,11 +37,17 @@ git writes, and again before `npm publish`.
 
 1. Checks `npm whoami`, branch (`develop`), clean tree, and that `develop` is
    not behind or diverged from `origin/develop`.
-2. Runs lint and test, bumps `package.json`, commits, tags `vX.Y.Z`, pushes
+2. Asks for release notes. Paste the text, then finish with a line that is only
+   a period (`.`). Press Enter on the first prompt to skip. If
+   `release-notes/X.Y.Z.md` already exists, that file is used and the prompt is
+   skipped.
+3. Runs lint and test, bumps `package.json`, commits (including
+   `release-notes/X.Y.Z.md` when notes were pasted), tags `vX.Y.Z`, pushes
    **develop** and the tag.
-3. Checks out `main`, fast-forward pulls, `merge --no-ff develop`, pushes `main`.
-4. Checks out the tag and runs `npm publish`.
-5. Checks out `develop` again.
+4. Checks out `main`, fast-forward pulls, `merge --no-ff develop`, pushes `main`.
+5. Checks out the tag. When notes were provided, creates the GitHub release from
+   `release-notes/X.Y.Z.md`. npm has no separate notes field.
+6. Runs `npm publish`, then checks out `develop` again.
 
 After publishing, update `podverse-partytime` in the Podverse monorepo to the
 new version and run install/build as needed.

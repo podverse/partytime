@@ -25,7 +25,10 @@ commands instead.
 ## Release notes
 
 Whenever you give the operator publish steps, include suggested release notes for the GitHub
-release and npm. Use `release-notes/X.Y.Z.md` when it exists; otherwise derive them from the
+release. `release.sh` asks them to paste that text (a line containing only `.` ends the paste,
+Enter on the first prompt skips). Pasted notes are committed as `release-notes/X.Y.Z.md` with the
+version bump and become the GitHub release body. npm has no separate notes field. Use
+`release-notes/X.Y.Z.md` when it already exists; otherwise derive them from the
 commits since the last formal tag:
 
 ```bash

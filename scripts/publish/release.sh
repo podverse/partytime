@@ -63,6 +63,41 @@ confirm() {
   fi
 }
 
+# Notes are saved into the version commit and used as the GitHub release body.
+# npm has no separate notes field. A blank first line skips both.
+NOTES_PATH="release-notes/${VERSION}.md"
+NOTES_TMP=""
+USE_NOTES=0
+
+cleanup_notes_tmp() {
+  if [[ -n "$NOTES_TMP" && -f "$NOTES_TMP" ]]; then
+    rm -f "$NOTES_TMP"
+  fi
+}
+trap cleanup_notes_tmp EXIT
+
+collect_release_notes() {
+  local dest="$1"
+  local line
+  local started=0
+  : >"$dest"
+  while IFS= read -r line; do
+    if [[ "$started" -eq 0 && -z "$line" ]]; then
+      rm -f "$dest"
+      return 1
+    fi
+    if [[ "$line" == "." ]]; then
+      break
+    fi
+    started=1
+    printf '%s\n' "$line" >>"$dest"
+  done
+  if [[ ! -s "$dest" ]]; then
+    rm -f "$dest"
+    return 1
+  fi
+}
+
 echo -e "${YELLOW}Checking npm login...${NC}"
 if ! npm whoami >/dev/null 2>&1; then
   echo -e "${RED}Error: not logged in to npm. Run this first:${NC}"
@@ -123,21 +158,45 @@ echo -e "Current version: ${GREEN}$CURRENT_VERSION${NC}"
 echo -e "Next version:    ${GREEN}$VERSION${NC}"
 echo ""
 echo "This will:"
-echo "  1. lint + test"
-echo "  2. bump package.json on develop, commit, tag $TAG, push develop + tag"
+echo "  1. ask for release notes (Enter skips; a line with only . ends a paste)"
+echo "  2. lint + test, bump package.json on develop, commit, tag $TAG, push develop + tag"
 echo "  3. merge develop into main with a merge commit (no squash) and push main"
-echo "  4. npm publish from $TAG"
+echo "  4. when notes were provided: commit $NOTES_PATH with the bump and create a GitHub release"
+echo "  5. npm publish from $TAG"
 echo ""
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
-  echo -e "${YELLOW}Dry run: lint and test only. No commit, tag, push, merge, or publish.${NC}"
+  echo -e "${YELLOW}Dry run: lint and test only. No notes prompt, commit, tag, push, merge, or publish.${NC}"
   npm run lint
   npm run test
   echo -e "${GREEN}✓ Dry run complete. Re-run without --dry-run to release.${NC}"
   exit 0
 fi
 
+if [[ -f "$NOTES_PATH" ]]; then
+  USE_NOTES=1
+  echo -e "${GREEN}Using existing $NOTES_PATH${NC}"
+else
+  echo ""
+  echo "Paste release notes for $TAG."
+  echo "When the paste is finished, type a line that is only a period (.) and press Enter."
+  echo "Or press Enter now to publish without release notes."
+  NOTES_TMP="$(mktemp)"
+  if collect_release_notes "$NOTES_TMP"; then
+    USE_NOTES=1
+    echo -e "${GREEN}Release notes captured.${NC}"
+  else
+    echo "No release notes. Publishing without a GitHub release."
+  fi
+fi
+echo ""
+
 confirm "Type yes to bump, merge to main, and continue toward publish"
+
+if [[ "$USE_NOTES" -eq 1 && -n "$NOTES_TMP" ]]; then
+  mkdir -p release-notes
+  cp "$NOTES_TMP" "$NOTES_PATH"
+fi
 
 "$SCRIPT_DIR/bump-version.sh" "$VERSION"
 
@@ -149,6 +208,14 @@ git push origin main
 
 echo -e "${YELLOW}Checking out $TAG for publish...${NC}"
 git checkout "$TAG"
+
+if [[ "$USE_NOTES" -eq 1 ]]; then
+  echo -e "${YELLOW}Creating GitHub release $TAG...${NC}"
+  if ! gh release create "$TAG" --title "podverse-partytime $VERSION" --notes-file "$NOTES_PATH"; then
+    echo -e "${YELLOW}GitHub release was not created. After npm publish, run:${NC}"
+    echo "  gh release create $TAG --title \"podverse-partytime $VERSION\" --notes-file $NOTES_PATH"
+  fi
+fi
 
 confirm "Type yes to publish podverse-partytime@$VERSION to npm"
 
