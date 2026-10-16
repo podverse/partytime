@@ -1,0 +1,9 @@
+---
+description: Operator shorthand next means what to do next
+alwaysApply: true
+---
+
+# next
+
+When the operator types **next**, treat it as **what next**: what they should do next in the
+current task. Answer with that step.

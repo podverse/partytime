@@ -1,0 +1,52 @@
+---
+description: Operator terminals are fish; copy-paste commands must not use bash heredocs
+alwaysApply: true
+---
+
+# Operator commands are fish
+
+The operator pastes commands into fish. The agent's own shell may be zsh. A command the
+operator will copy must parse in fish. A command the agent runs itself may use zsh.
+
+Keep the fence labeled `bash` so the editor still shows a copy button. The contents must
+still be valid fish.
+
+## Do not paste bash heredocs
+
+Fish rejects `<<`. The block fails before any line runs, including a `git add` above the
+commit:
+
+```bash
+git commit -m "$(cat <<'EOF'
+Message here.
+
+EOF
+)"
+```
+
+A one-line message:
+
+```bash
+git commit -m 'Message here.'
+```
+
+A multiline message is one single-quoted string with a real line break:
+
+```bash
+git commit -m 'First line.
+
+Second line.'
+```
+
+## Other bash syntax to avoid in operator pastes
+
+- `VAR=value command` — use `env VAR=value command`
+- `[[ ... ]]`
+- arrays (`arr=(a b)`)
+
+Pipes, `&&`, `$(...)`, and single-quoted strings are fine.
+
+## Agent-run commits
+
+When the agent itself runs `git commit` in its shell, a heredoc is fine. Never put that
+heredoc in a block the operator is told to paste.
