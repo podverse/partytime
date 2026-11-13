@@ -1,4 +1,4 @@
-import { DEFAULT_MAX_FEED_BODY_BYTES } from "../../config";
+import { DEFAULT_MAX_FEED_BODY_BYTES } from "../../settings";
 import { parseFeed } from "../index";
 
 const RSS_PREFIX = `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>`;

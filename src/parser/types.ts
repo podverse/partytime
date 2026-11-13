@@ -80,6 +80,11 @@ export interface BasicFeed {
   itunesTitle?: string;
   link: string;
   description: string;
+  /** The description text with its original line breaks and spacing, trimmed at both ends.
+   * Follows the same fallback chain as `description`: `<description>`, then `itunes:summary`,
+   * then subtitle / `itunes:subtitle`. Prefer `description` unless you need the whitespace.
+   */
+  descriptionRaw?: string;
   // #endregion
   // #region iTunes Required
   // https://help.apple.com/itc/podcasts_connect/#/itcb54353390
@@ -242,6 +247,10 @@ export interface Episode {
    * If you have an explicit need for content:encoded or summary please use those properties
    */
   description?: string;
+  /** The `<description>` text with its original line breaks and spacing, trimmed at both ends.
+   * Prefer `description` unless you need the whitespace.
+   */
+  descriptionRaw?: string;
   /** value of content:encoded, usually description is sufficient but some feeds do unexpected things */
   content?: string;
   image?: string;

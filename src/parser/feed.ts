@@ -47,6 +47,18 @@ function getDescription(feed: XmlNode): string {
   return "";
 }
 
+function getDescriptionRaw(feed: XmlNode): undefined | { descriptionRaw: string } {
+  const descriptionRaw =
+    getText(firstWithValue(feed.description)) ||
+    getText(firstWithValue(feed["itunes:summary"])) ||
+    getText(firstWithValue(feed.subtitle)) ||
+    getText(firstWithValue(feed["itunes:subtitle"]));
+  if (descriptionRaw) {
+    return { descriptionRaw };
+  }
+  return undefined;
+}
+
 function getCopyright(feed: XmlNode): undefined | { copyright: string } {
   const node = firstWithValue(feed.copyright);
   if (node) {
@@ -633,6 +645,7 @@ export function handleFeed(feed: XmlNode, feedType: FeedType): BasicFeed {
     type: feedType,
     title: getTitle(feed),
     description: getDescription(feed),
+    ...getDescriptionRaw(feed),
     link: getLink(feed),
     explicit: getExplicit(feed),
     itunesBlock: getItunesBlock(feed),

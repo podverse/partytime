@@ -6,9 +6,13 @@ Podcast feed parser, originally extracted from podcast index - https://github.co
 
 This package will also identify [new namespace elements](https://github.com/Podcastindex-org/podcast-namespace) and call out the "phases" implemented by the feed in a `pc20support` element.
 
-By default, this will produce log messages that are warnings or errors, but this can be controlled via an environment variable, `PARTYTIME_LOG` can be set to whatever log level you may want.
+By default, the root entry (`podverse-partytime`) produces warning/error log messages, and
+`PARTYTIME_LOG` can set the root log level.
 
-`parseFeed` rejects XML larger than **20 MiB** (UTF-8 byte length) by default and returns `null`. Override with `maxFeedBodyBytes` in the second argument (integer bytes between 1000 and 50000000), or set **`PARSER_MAX_FEED_BODY_BYTES`** in the environment (same bounds). Resolution order: `maxFeedBodyBytes` → env → default.
+`parseFeed` rejects XML larger than **20 MiB** (UTF-8 byte length) by default and returns `null`.
+Override with `maxFeedBodyBytes` in the second argument (integer bytes between 1000 and 50000000),
+or set **`PARSER_MAX_FEED_BODY_BYTES`** in the environment for the root entry (same bounds).
+Resolution order: `maxFeedBodyBytes` → env → default.
 
 ## Usage
 
@@ -18,6 +22,21 @@ npm install podverse-partytime
 
 Requires **Node.js 22.12 or newer**. The package is CommonJS and depends on an ESM-only HTML entity
 decoder, which needs `require()` of ES modules.
+
+### Portable entry (React Native, browsers, servers)
+
+```ts
+import { parseFeed } from "podverse-partytime/core";
+```
+
+`podverse-partytime/core` returns the same `FeedObject` shape, but reads no environment variables
+and imports no Node-only modules. Pass `maxFeedBodyBytes` per call when needed. Logs default to
+`console` at `warn`, and callers can change behavior with
+`setPartytimeLogLevel("silent" | "error" | "warn" | "info" | "debug" | "trace")` or
+`setPartytimeLogger(sink)`.
+
+The root entry (`podverse-partytime`) adds `checkFeedByUri` / `checkFeedByObject`, reads
+`PARTYTIME_LOG` and `PARSER_MAX_FEED_BODY_BYTES`, configures `pino`, and requires Node.
 
 ### Typescript
 

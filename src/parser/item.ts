@@ -73,11 +73,7 @@ export function getGuid(item: XmlNode): string {
     return numberValue.toString();
   }
 
-  if (typeof process !== "undefined" && !process.env?.JEST_WORKER_ID) {
-    // This block is safe for both Node and browser
-    // eslint-disable-next-line no-console
-    console.warn("Empty/missing guid, returning empty string");
-  }
+  logger.warn("Empty/missing guid, returning empty string");
 
   return "";
 }
@@ -149,6 +145,14 @@ export function getDescription(item: XmlNode): undefined | { description: string
     return { description: summary.summary };
   }
 
+  return undefined;
+}
+
+export function getDescriptionRaw(item: XmlNode): undefined | { descriptionRaw: string } {
+  const descriptionRaw = getText(firstWithValue(item.description));
+  if (descriptionRaw) {
+    return { descriptionRaw };
+  }
   return undefined;
 }
 
@@ -337,6 +341,7 @@ export function handleItem(item: XmlNode, _feed: BasicFeed): Episode {
     ...getImage(item),
     ...getSummary(item),
     ...getDescription(item),
+    ...getDescriptionRaw(item),
     ...getSubtitle(item),
     ...getContent(item),
   };

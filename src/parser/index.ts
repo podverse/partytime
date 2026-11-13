@@ -4,10 +4,14 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import config, { DEFAULT_MAX_FEED_BODY_BYTES } from "../config";
 import { logger } from "../logger";
+import {
+  DEFAULT_MAX_FEED_BODY_BYTES,
+  getConfiguredMaxFeedBodyBytes,
+} from "../settings";
 
 import { ParserOptions, unifiedParser } from "./unified";
+import { exceedsUtf8ByteLimit, utf8ByteLength } from "./utf8";
 import { parse, validate } from "./xml-parser";
 import { FeedObject, FeedType } from "./types";
 
@@ -15,6 +19,7 @@ const OPTIONS_MAX_FEED_BODY_BYTES_MIN = 1000;
 const OPTIONS_MAX_FEED_BODY_BYTES_MAX = 50_000_000;
 
 function resolveMaxFeedBodyBytes(options?: ParserOptions): number {
+  const configuredMaxFeedBodyBytes = getConfiguredMaxFeedBodyBytes();
   const fromOptions = options?.maxFeedBodyBytes;
   if (fromOptions !== undefined) {
     if (
@@ -25,18 +30,18 @@ function resolveMaxFeedBodyBytes(options?: ParserOptions): number {
       logger.warn(
         `maxFeedBodyBytes must be between ${OPTIONS_MAX_FEED_BODY_BYTES_MIN} and ${OPTIONS_MAX_FEED_BODY_BYTES_MAX}; using default ${DEFAULT_MAX_FEED_BODY_BYTES}`
       );
-      return config.parserMaxFeedBodyBytes ?? DEFAULT_MAX_FEED_BODY_BYTES;
+      return configuredMaxFeedBodyBytes ?? DEFAULT_MAX_FEED_BODY_BYTES;
     }
     return fromOptions;
   }
-  return config.parserMaxFeedBodyBytes ?? DEFAULT_MAX_FEED_BODY_BYTES;
+  return configuredMaxFeedBodyBytes ?? DEFAULT_MAX_FEED_BODY_BYTES;
 }
 
 export function parseFeed(xml: string, options?: ParserOptions): FeedObject | null {
   const trimmed = xml.trim();
   const limit = resolveMaxFeedBodyBytes(options);
-  const byteLength = Buffer.byteLength(trimmed, "utf8");
-  if (byteLength > limit) {
+  if (exceedsUtf8ByteLimit(trimmed, limit)) {
+    const byteLength = utf8ByteLength(trimmed);
     logger.warn(
       `Feed XML exceeds max size (${byteLength} UTF-8 bytes > ${limit} bytes); skipping parse`
     );
