@@ -1506,6 +1506,81 @@ describe("item handling", () => {
     });
   });
 
+  describe("descriptionRaw", () => {
+    it("keeps line breaks in plain-text description while description stays collapsed", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <description>
+First paragraph line one.
+Line two.
+
+Second paragraph.
+          </description>
+          <guid isPermaLink="true">https://example.com/ep0003</guid>
+          <enclosure url="https://aphid.fireside.fm/d/1437767933/65632ad5-59b2-4e30-82d1-13845dce07dd/d11384ea-69b5-4e33-bd0e-5d33fdba8a0d.mp3" length="78034115" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml);
+      const [first] = result.items;
+
+      expect(first).toHaveProperty(
+        "description",
+        "First paragraph line one. Line two. Second paragraph."
+      );
+      expect(first).toHaveProperty(
+        "descriptionRaw",
+        "First paragraph line one.\nLine two.\n\nSecond paragraph."
+      );
+    });
+
+    it("keeps HTML inside CDATA with its line breaks", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <description><![CDATA[<p>One</p>
+<ul>
+<li>Two</li>
+</ul>]]></description>
+          <guid isPermaLink="true">https://example.com/ep0003</guid>
+          <enclosure url="https://aphid.fireside.fm/d/1437767933/65632ad5-59b2-4e30-82d1-13845dce07dd/d11384ea-69b5-4e33-bd0e-5d33fdba8a0d.mp3" length="78034115" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml);
+      const [first] = result.items;
+
+      expect(first).toHaveProperty("description", "<p>One</p> <ul> <li>Two</li> </ul>");
+      expect(first).toHaveProperty("descriptionRaw", "<p>One</p>\n<ul>\n<li>Two</li>\n</ul>");
+    });
+
+    it("is absent when the item has no description", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+        <item>
+          <content:encoded>
+          <![CDATA[ <p>hello</p> ]]>
+          </content:encoded>
+          <guid isPermaLink="true">https://example.com/ep0003</guid>
+          <enclosure url="https://aphid.fireside.fm/d/1437767933/65632ad5-59b2-4e30-82d1-13845dce07dd/d11384ea-69b5-4e33-bd0e-5d33fdba8a0d.mp3" length="78034115" type="audio/mpeg"/>
+        </item>
+        `
+      );
+
+      const result = parseFeed(xml);
+      const [first] = result.items;
+
+      expect(first).toHaveProperty("description", "<p>hello</p>");
+      expect(first).not.toHaveProperty("descriptionRaw");
+    });
+  });
+
   describe("summary", () => {
     it("extracts the value", () => {
       const xml = helpers.spliceFeed(

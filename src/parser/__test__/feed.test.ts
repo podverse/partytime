@@ -185,6 +185,80 @@ describe("feed handling", () => {
     });
   });
 
+  describe("descriptionRaw", () => {
+    it("keeps line breaks in plain-text description while description stays collapsed", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+          <description>
+First paragraph line one.
+Line two.
+
+Second paragraph.
+          </description>
+        `
+      );
+
+      const result = parseFeed(xml);
+
+      expect(result).toHaveProperty(
+        "description",
+        "First paragraph line one. Line two. Second paragraph."
+      );
+      expect(result).toHaveProperty(
+        "descriptionRaw",
+        "First paragraph line one.\nLine two.\n\nSecond paragraph."
+      );
+    });
+
+    it("keeps HTML inside CDATA with its line breaks", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+          <description><![CDATA[<p>One</p>
+<p>Two</p>]]></description>
+        `
+      );
+
+      const result = parseFeed(xml);
+
+      expect(result).toHaveProperty("description", "<p>One</p> <p>Two</p>");
+      expect(result).toHaveProperty("descriptionRaw", "<p>One</p>\n<p>Two</p>");
+    });
+
+    it("falls back to itunes:summary with its line breaks", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+          <itunes:summary>
+Summary line one.
+
+Summary line two.
+          </itunes:summary>
+        `
+      );
+
+      const result = parseFeed(xml);
+
+      expect(result).toHaveProperty("description", "Summary line one. Summary line two.");
+      expect(result).toHaveProperty("descriptionRaw", "Summary line one.\n\nSummary line two.");
+    });
+
+    it("is absent when the feed has no description source", () => {
+      const xml = helpers.spliceFeed(
+        feed,
+        `
+          <title>Test</title>
+        `
+      );
+
+      const result = parseFeed(xml);
+
+      expect(result).toHaveProperty("description", "");
+      expect(result).not.toHaveProperty("descriptionRaw");
+    });
+  });
+
   describe("summary", () => {
     it("extracts the value", () => {
       const xml = helpers.spliceFeed(
