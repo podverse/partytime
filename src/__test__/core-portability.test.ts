@@ -18,7 +18,7 @@ describe("core entry portability", () => {
       logLevel: "silent",
     });
 
-    const metafile = result.metafile;
+    const { metafile } = result;
     expect(metafile).toBeDefined();
     if (!metafile) {
       return;

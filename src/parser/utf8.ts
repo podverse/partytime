@@ -6,26 +6,21 @@ export function utf8ByteLength(text: string): number {
 
     if (codeUnit < 0x80) {
       size += 1;
-      continue;
-    }
-
-    if (codeUnit < 0x800) {
+    } else if (codeUnit < 0x800) {
       size += 2;
-      continue;
+    } else {
+      const isHighSurrogate = codeUnit >= 0xd800 && codeUnit <= 0xdbff;
+      const nextCodeUnit = i + 1 < text.length ? text.charCodeAt(i + 1) : undefined;
+      const isFollowedByLowSurrogate =
+        nextCodeUnit !== undefined && nextCodeUnit >= 0xdc00 && nextCodeUnit <= 0xdfff;
+
+      if (isHighSurrogate && isFollowedByLowSurrogate) {
+        size += 4;
+        i += 1;
+      } else {
+        size += 3;
+      }
     }
-
-    const isHighSurrogate = codeUnit >= 0xd800 && codeUnit <= 0xdbff;
-    const nextCodeUnit = i + 1 < text.length ? text.charCodeAt(i + 1) : undefined;
-    const isFollowedByLowSurrogate =
-      nextCodeUnit !== undefined && nextCodeUnit >= 0xdc00 && nextCodeUnit <= 0xdfff;
-
-    if (isHighSurrogate && isFollowedByLowSurrogate) {
-      size += 4;
-      i += 1;
-      continue;
-    }
-
-    size += 3;
   }
 
   return size;

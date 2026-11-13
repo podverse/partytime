@@ -1,9 +1,4 @@
-import {
-  parseFeed,
-  setPartytimeLogger,
-  setPartytimeLogLevel,
-  type PartytimeLogger,
-} from "../core";
+import { parseFeed, setPartytimeLogger, setPartytimeLogLevel, type PartytimeLogger } from "../core";
 
 function createLoggerSpySink(): PartytimeLogger & {
   trace: jest.Mock;
@@ -22,7 +17,9 @@ function createLoggerSpySink(): PartytimeLogger & {
 }
 
 describe("portable logger controls", () => {
-  let warnSpy: jest.SpyInstance<void, [message?: unknown, ...optionalParams: unknown[]]> | undefined;
+  let warnSpy:
+    | jest.SpyInstance<void, [message?: unknown, ...optionalParams: unknown[]]>
+    | undefined;
 
   afterEach(() => {
     setPartytimeLogger(null);

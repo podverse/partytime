@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires -- intentional require() after resetModules */
 describe("PARSER_MAX_FEED_BODY_BYTES env", () => {
   const originalEnv = process.env.PARSER_MAX_FEED_BODY_BYTES;
+  const originalLogLevel = process.env.PARTYTIME_LOG;
 
   afterEach(() => {
     jest.resetModules();
@@ -10,12 +11,18 @@ describe("PARSER_MAX_FEED_BODY_BYTES env", () => {
     } else {
       process.env.PARSER_MAX_FEED_BODY_BYTES = originalEnv;
     }
+    if (originalLogLevel === undefined) {
+      delete process.env.PARTYTIME_LOG;
+    } else {
+      process.env.PARTYTIME_LOG = originalLogLevel;
+    }
   });
 
   it("applies limit from env when options omit maxFeedBodyBytes", () => {
     jest.resetModules();
+    process.env.PARTYTIME_LOG = "silent";
     process.env.PARSER_MAX_FEED_BODY_BYTES = "2500";
-    const { parseFeed } = require("../index") as typeof import("../index");
+    const { parseFeed } = require("../../index") as typeof import("../../index");
     const prefix = `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>`;
     const suffix = `</title></channel></rss>`;
     const fixed = Buffer.byteLength(prefix, "utf8") + Buffer.byteLength(suffix, "utf8");
@@ -30,8 +37,9 @@ describe("PARSER_MAX_FEED_BODY_BYTES env", () => {
 
   it("ParserOptions.maxFeedBodyBytes overrides env", () => {
     jest.resetModules();
+    process.env.PARTYTIME_LOG = "silent";
     process.env.PARSER_MAX_FEED_BODY_BYTES = "1500";
-    const { parseFeed } = require("../index") as typeof import("../index");
+    const { parseFeed } = require("../../index") as typeof import("../../index");
     const prefix = `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>`;
     const suffix = `</title></channel></rss>`;
     const fixed = Buffer.byteLength(prefix, "utf8") + Buffer.byteLength(suffix, "utf8");

@@ -5,10 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { logger } from "../logger";
-import {
-  DEFAULT_MAX_FEED_BODY_BYTES,
-  getConfiguredMaxFeedBodyBytes,
-} from "../settings";
+import { DEFAULT_MAX_FEED_BODY_BYTES, getConfiguredMaxFeedBodyBytes } from "../settings";
 
 import { ParserOptions, unifiedParser } from "./unified";
 import { exceedsUtf8ByteLimit, utf8ByteLength } from "./utf8";
